@@ -1,172 +1,150 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Smart Calculator</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: -apple-system, sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>My Mobile Calc</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+        
+        body { 
+            background-color: #000; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-end; 
+            height: 100dvh; 
+            overflow: hidden;
+        }
 
-    body {
-      margin: 0;
-      background-color: #000;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      height: 100vh;
-      overflow: hidden;
-      padding: 0;
-    }
+        .calc-container { 
+            width: 100%; 
+            padding: 20px;
+            /* ป้องกันการโดนแถบโฮมของ iPhone บัง */
+            padding-bottom: calc(env(safe-area-inset-bottom) + 20px); 
+        }
 
-    .calc-container {
-      width: 100%; /* เปลี่ยนจาก 300px หรือค่าเดิมเป็น 100% */
-    padding: 20px;
-    /* เพิ่มบรรทัดนี้เพื่อรองรับขอบล่างของ iPhone (Dynamic Island/Home bar) */
-    padding-bottom: calc(env(safe-area-inset-bottom) + 20px);
-    }
+        #screen { 
+            width: 100%; 
+            height: 140px; 
+            font-size: 80px; 
+            text-align: right; 
+            border: none; 
+            background: transparent; 
+            color: white; 
+            outline: none;
+            /* บรรทัดนี้ทำให้ชิดขอบขวาสุด */
+            padding-right: 0px; 
+            display: block;
+        }
 
-    #screen { 
-    width: 100%; 
-    height: 140px; /* เพิ่มความสูงของหน้าจอ */
-    font-size: 80px; /* ขยายตัวเลขให้ใหญ่ขึ้น */
-    text-align: right; 
-    border: none; 
-    background: transparent; 
-    color: white; 
-    outline: none;
-    padding-right: 0px; /* ลบ padding ออกเพื่อให้ชิดขอบขวาสุด */
-    display: block;
-    }
+        .btn-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 12px; 
+        }
 
-    .btn-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
+        button { 
+            aspect-ratio: 1/1; 
+            font-size: 32px; 
+            border: none; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            color: white; 
+            background-color: #333; 
+        }
 
-    button {
-      aspect-ratio: 1/1;
-      font-size: 24px;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      color: white;
-      background-color: #333;
-      transition: brightness 0.1s;
-    }
-
-    button:active {
-      filter: brightness(1.5);
-    }
-
-    .operator {
-      background-color: #ff9f0a;
-    }
-
-    .special {
-      background-color: #a5a5a5;
-      color: black;
-    }
-
-    .double {
-      grid-column: span 2;
-      aspect-ratio: auto;
-      border-radius: 50px;
-    }
-  </style>
+        button:active { background-color: #555; }
+        .operator { background-color: #ff9f0a; }
+        .special { background-color: #a5a5a5; color: black; }
+        .double { 
+            grid-column: span 2; 
+            aspect-ratio: auto; 
+            border-radius: 50px; 
+            text-align: left;
+            padding-left: 30px;
+        }
+    </style>
 </head>
-
 <body>
 
-  <div class="calc-container">
-    <input type="text" id="screen" readonly placeholder="0">
-
-    <div class="btn-grid">
-      <button class="special" onclick="clearScreen()">AC</button>
-      <button class="special" onclick="backspace()">DEL</button>
-      <button class="special" onclick="calculatePercentage()">%</button>
-      <button class="operator" onclick="addToScreen('/')">÷</button>
-
-      <button onclick="addToScreen('7')">7</button>
-      <button onclick="addToScreen('8')">8</button>
-      <button onclick="addToScreen('9')">9</button>
-      <button class="operator" onclick="addToScreen('*')">×</button>
-
-      <button onclick="addToScreen('4')">4</button>
-      <button onclick="addToScreen('5')">5</button>
-      <button onclick="addToScreen('6')">6</button>
-      <button class="operator" onclick="addToScreen('-')">-</button>
-
-      <button onclick="addToScreen('1')">1</button>
-      <button onclick="addToScreen('2')">2</button>
-      <button onclick="addToScreen('3')">3</button>
-      <button class="operator" onclick="addToScreen('+')">+</button>
-
-      <button class="double" onclick="addToScreen('0')">0</button>
-      <button onclick="addToScreen('.')">.</button>
-      <button class="operator" onclick="calculate()">=</button>
+    <div class="calc-container">
+        <input type="text" id="screen" readonly placeholder="0">
+        <div class="btn-grid">
+            <button class="special" onclick="clearScreen()">AC</button>
+            <button class="special" onclick="backspace()">DEL</button>
+            <button class="special" onclick="calculatePercentage()">%</button>
+            <button class="operator" onclick="addToScreen('/')">÷</button>
+            
+            <button onclick="addToScreen('7')">7</button>
+            <button onclick="addToScreen('8')">8</button>
+            <button onclick="addToScreen('9')">9</button>
+            <button class="operator" onclick="addToScreen('*')">×</button>
+            
+            <button onclick="addToScreen('4')">4</button>
+            <button onclick="addToScreen('5')">5</button>
+            <button onclick="addToScreen('6')">6</button>
+            <button class="operator" onclick="addToScreen('-')">-</button>
+            
+            <button onclick="addToScreen('1')">1</button>
+            <button onclick="addToScreen('2')">2</button>
+            <button onclick="addToScreen('3')">3</button>
+            <button class="operator" onclick="addToScreen('+')">+</button>
+            
+            <button class="double" onclick="addToScreen('0')">0</button>
+            <button onclick="addToScreen('.')">.</button>
+            <button class="operator" onclick="calculate()">=</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const screen = document.getElementById('screen');
-    let lastInputIsOperator = false;
+    <script>
+        const screen = document.getElementById('screen');
+        let lastInputIsOperator = false;
 
-    function addToScreen(value) {
-      // ถ้ากดเครื่องหมายซ้ำ จะเปลี่ยนตัวเก่าเป็นตัวใหม่
-      if (isOperator(value) && lastInputIsOperator) {
-        screen.value = screen.value.slice(0, -1) + value;
-        return;
-      }
-      screen.value += value;
-      lastInputIsOperator = isOperator(value);
-    }
-
-    function isOperator(char) {
-      return ['+', '-', '*', '/'].includes(char);
-    }
-
-    function clearScreen() {
-      screen.value = '';
-      lastInputIsOperator = false;
-    }
-
-    function backspace() {
-      screen.value = screen.value.slice(0, -1);
-    }
-
-    function calculatePercentage() {
-      if (screen.value !== "") {
-        try {
-          // คำนวณค่าปัจจุบันแล้วหาร 100 ทันที
-          let result = eval(screen.value) / 100;
-          screen.value = result;
-        } catch {
-          screen.value = 'Error';
+        function addToScreen(value) {
+            if (isOperator(value) && lastInputIsOperator) {
+                screen.value = screen.value.slice(0, -1) + value;
+                return;
+            }
+            screen.value += value;
+            lastInputIsOperator = isOperator(value);
         }
-      }
-    }
 
-    function calculate() {
-      try {
-        if (screen.value === "") return;
-        let result = eval(screen.value);
-        // จัดการเรื่องทศนิยมไม่ให้ยาวเกินไป
-        if (result % 1 !== 0) {
-          result = Math.round(result);
+        function isOperator(char) {
+            return ['+', '-', '*', '/'].includes(char);
         }
-        screen.value = result;
-        lastInputIsOperator = false;
-      } catch (err) {
-        screen.value = 'Error';
-      }
-    }
-  </script>
+
+        function clearScreen() {
+            screen.value = '';
+            lastInputIsOperator = false;
+        }
+
+        function backspace() {
+            screen.value = screen.value.slice(0, -1);
+        }
+
+        function calculatePercentage() {
+            if (screen.value !== "") {
+                try {
+                    let result = eval(screen.value) / 100;
+                    screen.value = result;
+                } catch {
+                    screen.value = 'Error';
+                }
+            }
+        }
+
+        function calculate() {
+            try {
+                if (screen.value === "") return;
+                let result = eval(screen.value);
+                // ปัดเศษเป็นจำนวนเต็มตามที่คุณต้องการ
+                result = Math.round(result);
+                screen.value = result;
+                lastInputIsOperator = false;
+            } catch (err) {
+                screen.value = 'Error';
+            }
+        }
+    </script>
 </body>
-
-
 </html>
