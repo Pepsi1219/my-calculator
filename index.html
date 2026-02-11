@@ -110,7 +110,7 @@
                     result = Math.ceil(result);
                 }
                 
-                screen.value = result;
+                screen.value = result.toLocaleString('en-US');
                 lastInputIsOperator = false;
             } catch (err) {
                 screen.value = 'Error';
@@ -119,6 +119,7 @@
     </script>
 </body>
 </html>
+
 
 
 
