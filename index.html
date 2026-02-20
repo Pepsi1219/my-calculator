@@ -1,254 +1,218 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSA Operation Sign-Off Report</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    body {
-      font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f8f9fa;
-      color: #333;
-      padding: 15px;
-      line-height: 1.4;
-    }
+<title>CSA Operation Sign-Off Report</title>
 
-    .report-container {
-      max-width: 100%;
-      margin: 0 auto;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
+<style>
 
-    h1.report-title {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #1a3c6d;
-      font-size: 1.8rem;
-    }
-
-    .form-header {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px 16px;
-      margin-bottom: 24px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .field label {
-      font-size: 0.85rem;
-      margin-bottom: 4px;
-      font-weight: 600;
-      color: #444;
-    }
-
-    .field input, .field select {
-      padding: 8px 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 0.95rem;
-    }
-
-    .field.small input {
-      width: 100px;
-    }
-
-    .table-wrapper {
-      overflow-x: auto;
-      margin-bottom: 20px;
-    }
-
-    table.report-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-      min-width: 1100px; /* ป้องกันตารางแตกเกินไป */
-      
-    }
-    .report-table {
-      table-layout: fixed;   /* ⭐ สำคัญมาก */
-      width: 100%;
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
-/* 4 ช่องสาเหตุหลัก */
-.cause-col {
-  width: 90px;
+body{
+  font-family:'Sarabun','Segoe UI',Tahoma;
+  background:#f8f9fa;
+  padding:15px;
 }
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px 10px;
-      text-align: center;
-      vertical-align: middle;
-    }
+.report-container{
+  background:white;
+  padding:20px;
+  border-radius:8px;
+  box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
 
-    th {
-      background: #e9ecef;
-      font-weight: 600;
-    }
+.report-title{
+  text-align:center;
+  margin-bottom:20px;
+  color:#1a3c6d;
+}
 
-    .highlight-header {
-      background: #ffebee;
-      font-weight: bold;
-    }
+.form-header{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px 16px;
+  margin-bottom:24px;
+}
 
-    .day-cell {
-      background: #f0f4ff;
-      font-weight: bold;
-    }
+.field{
+  display:flex;
+  flex-direction:column;
+}
 
-    .signature-cell {
-      min-width: 140px;
-      height: 80px;
-      vertical-align: bottom;
-    }
+.field label{
+  font-size:.85rem;
+  margin-bottom:4px;
+  font-weight:600;
+}
 
-    .plan-cell {
-      min-width: 180px;
-      text-align: left;
-    }
+.field input{
+  padding:8px 10px;
+  border:1px solid #ccc;
+  border-radius:5px;
+}
 
-    @media (max-width: 768px) {
-      .report-title { font-size: 1.5rem; }
-      .form-header { grid-template-columns: 1fr 1fr; }
-      .field.small input { width: 80px; }
-      table.report-table { font-size: 0.82rem; }
-      th, td { padding: 6px 8px; }
-      
-    }
-  </style>
+.table-wrapper{
+  overflow-x:auto;
+}
+
+/* ================= TABLE ================= */
+
+.report-table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1100px;
+  table-layout:fixed;
+  font-size:.9rem;
+}
+
+/* equal cause columns */
+.cause-col{
+  width:90px;
+}
+
+/* wrap text */
+th,td{
+  border:1px solid #ccc;
+  padding:8px;
+  text-align:center;
+  vertical-align:middle;
+
+  white-space:normal;
+  word-break:break-word;
+}
+
+/* equal row height */
+tbody tr{
+  height:70px;
+}
+
+th{
+  background:#e9ecef;
+}
+
+.highlight-header{
+  background:#ffebee;
+  font-weight:bold;
+}
+
+.day-cell{
+  background:#f0f4ff;
+  font-weight:bold;
+}
+
+.plan-cell{
+  text-align:left;
+}
+
+.signature-cell{
+  height:70px;
+}
+
+</style>
 </head>
+
 <body>
 
 <div class="report-container">
 
-  <h1 class="report-title">CSA OPERATION SIGN-OFF REPORT</h1>
+<h1 class="report-title">CSA OPERATION SIGN-OFF REPORT</h1>
 
-  <div class="form-header">
-    <div class="field">
-      <label>ขั้นตอนหลัก</label>
-      <input type="text">
-    </div>
-    <div class="field">
-      <label>พนักงาน</label>
-      <input type="text">
-    </div>
-    <div class="field">
-      <label>ครูฝึก</label>
-      <input type="text">
-    </div>
-
-    <div class="field">
-      <label>SAM</label>
-      <input type="number" step="0.01">
-    </div>
-    <div class="field small">
-      <label>เป้าหมาย Eff (%)</label>
-      <input type="number" step="0.1">
-    </div>
-    <div class="field small">
-      <label>Q'ty</label>
-      <input type="number">
-    </div>
-
-    <div class="field">
-      <label>ระดับงาน</label>
-      <input type="text">
-    </div>
-    <div class="field">
-      <label>ชนิดผ้า</label>
-      <input type="text">
-    </div>
-    <div class="field">
-      <label>วันที่ฝึกอบรม</label>
-      <input type="date">
-    </div>
-    <div class="field">
-      <label>วันที่โอนย้าย</label>
-      <input type="date">
-    </div>
-  </div>
-
-  <!-- ตารางหลัก -->
-  <div class="table-wrapper">
-    <table class="report-table">
-      <thead>
-        <tr>
-          <th rowspan="3">วัน</th>
-          <!-- ประสิทธิภาพ -->
-          <th colspan="6" class="highlight-header">ประสิทธิภาพ</th>
-          <!-- คุณภาพ -->
-          <th colspan="3" class="highlight-header">คุณภาพ</th>
-          <!-- สาเหตุหลัก -->
-          <th colspan="4" class="highlight-header">สาเหตุหลัก</th>
-          <th rowspan="3">แผนการแก้ไข</th>
-          <th rowspan="3">ลายเซ็น<br>ผู้ปฏิบัติงาน</th>
-        </tr>
-        <tr>
-          <th class="highlight-header">เป้าหมาย<br>(%)</th>
-          <th class="highlight-header">เป้าหมาย<br>(ชิ้น)</th>
-          <th class="highlight-header">เวลาเฉลี่ยจริง<br>(วินาที)</th>
-          <th class="highlight-header">เวลาต่อรอบ<br>(นาที)</th>
-          <th class="highlight-header">ประสิทธิภาพจริง<br>(%)</th>
-          <th class="highlight-header">ประสิทธิภาพจริง<br>(ชิ้น)</th>
-
-          <th class="highlight-header">ผ่าน</th>
-          <th class="highlight-header">ไม่ผ่าน</th>
-          <th class="highlight-header">อัตราผ่าน<br>(%)</th>
-
-          
-          <th class="highlight-header">คน</th>
-          <th class="highlight-header">เครื่องจักร</th>
-          <th class="highlight-header">วิธีการ</th>
-          <th class="highlight-header">วัตถุดิบ</th>
-          
-        </tr>
-      </thead>
-
-      <tbody>
-        <!-- สร้าง 10 แถวตามแบบฟอร์ม -->
-        <tr>
-          <td class="day-cell">1</td>
-          <td></td><td></td><td></td><td></td><td></td><td></td>
-          <td></td><td></td><td></td>
-          <td></td><td></td><td></td>
-          <td class="plan-cell"></td>
-          <td class="signature-cell"></td>
-        </tr>
-        <tr>
-          <td class="day-cell">2</td>
-          <td></td><td></td><td></td><td></td><td></td><td></td>
-          <td></td><td></td><td></td>
-          <td></td><td></td><td></td>
-          <td class="plan-cell"></td>
-          <td class="signature-cell"></td>
-        </tr>
-        <!-- ทำซ้ำจนครบ 10 วัน หรือจะให้ JS generate ก็ได้ -->
-        <tr><td class="day-cell">3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td class="day-cell">4</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td class="day-cell">5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td class="day-cell">6</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td class="day-cell">7</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td class="day-cell">8</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td class="day-cell">9</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td class="day-cell">10</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-      </tbody>
-    </table>
-  </div>
-
+<div class="form-header">
+  <div class="field"><label>ขั้นตอนหลัก</label><input></div>
+  <div class="field"><label>พนักงาน</label><input></div>
+  <div class="field"><label>ครูฝึก</label><input></div>
+  <div class="field"><label>SAM</label><input type="number"></div>
+  <div class="field"><label>เป้าหมาย Eff (%)</label><input type="number"></div>
+  <div class="field"><label>Q'ty</label><input type="number"></div>
+  <div class="field"><label>ระดับงาน</label><input></div>
+  <div class="field"><label>ชนิดผ้า</label><input></div>
+  <div class="field"><label>วันที่ฝึกอบรม</label><input type="date"></div>
+  <div class="field"><label>วันที่โอนย้าย</label><input type="date"></div>
 </div>
+
+<div class="table-wrapper">
+
+<table class="report-table">
+
+<!-- ⭐ column control -->
+<colgroup>
+  <col>
+  <col span="6">
+  <col span="3">
+  <col class="cause-col">
+  <col class="cause-col">
+  <col class="cause-col">
+  <col class="cause-col">
+  <col>
+  <col>
+</colgroup>
+
+<thead>
+<tr>
+<th rowspan="2">วัน</th>
+<th colspan="6" class="highlight-header">ประสิทธิภาพ</th>
+<th colspan="3" class="highlight-header">คุณภาพ</th>
+<th colspan="4" class="highlight-header">สาเหตุหลัก</th>
+<th rowspan="2">แผนการแก้ไข</th>
+<th rowspan="2">ลายเซ็น</th>
+</tr>
+
+<tr>
+<th>เป้าหมาย%</th>
+<th>เป้าหมายชิ้น</th>
+<th>เวลาเฉลี่ย</th>
+<th>เวลาต่อรอบ</th>
+<th>Eff%</th>
+<th>Eff ชิ้น</th>
+
+<th>ผ่าน</th>
+<th>ไม่ผ่าน</th>
+<th>อัตราผ่าน%</th>
+
+<th>คน</th>
+<th>เครื่องจักร</th>
+<th>วิธีการ</th>
+<th>วัตถุดิบ</th>
+</tr>
+</thead>
+
+<tbody id="tableBody">
+<!-- JS Generate -->
+</tbody>
+
+</table>
+</div>
+</div>
+
+<script>
+
+/* ===== Generate 30 Rows Automatically ===== */
+
+const tbody = document.getElementById("tableBody");
+
+for(let day=1; day<=30; day++){
+
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td class="day-cell">${day}</td>
+    ${"<td></td>".repeat(6)}
+    ${"<td></td>".repeat(3)}
+    ${"<td></td>".repeat(4)}
+    <td class="plan-cell"></td>
+    <td class="signature-cell"></td>
+  `;
+
+  tbody.appendChild(row);
+}
+
+</script>
 
 </body>
 </html>
