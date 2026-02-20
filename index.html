@@ -1,127 +1,241 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Calculator</title>
-    <style>
-        * { box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { 
-            margin: 0; background-color: #ffffff; 
-            display: flex; justify-content: center; align-items: flex-end; 
-            height: 100vh; overflow: hidden;
-        }
-        .calc-container { width: 100%; max-width: 400px; padding: 20px; }
-        #screen { 
-            width: 100%; height: 100px; font-size: 50px; text-align: right; 
-            border: none; background: transparent; color: #000; 
-            margin-bottom: 10px; outline: none;
-        }
-        .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        button { 
-            aspect-ratio: 1/1; font-size: 24px; border: none; 
-            border-radius: 50%; cursor: pointer; color: white; 
-            background-color: #333; transition: brightness 0.1s;
-        }
-        button:active { filter: brightness(1.5); }
-        .operator { background-color: #ff9f0a; }
-        .special { background-color: #a5a5a5; color: black; }
-        .double { grid-column: span 2; aspect-ratio: auto; border-radius: 50px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSA Operation Sign-Off Report</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8f9fa;
+      color: #333;
+      padding: 15px;
+      line-height: 1.4;
+    }
+
+    .report-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h1.report-title {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #1a3c6d;
+      font-size: 1.8rem;
+    }
+
+    .form-header {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px 16px;
+      margin-bottom: 24px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field label {
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    .field input, .field select {
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 0.95rem;
+    }
+
+    .field.small input {
+      width: 100px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
+    table.report-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 1100px; /* ป้องกันตารางแตกเกินไป */
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 10px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #e9ecef;
+      font-weight: 600;
+    }
+
+    .highlight-header {
+      background: #ffebee;
+      font-weight: bold;
+    }
+
+    .day-cell {
+      background: #f0f4ff;
+      font-weight: bold;
+    }
+
+    .signature-cell {
+      min-width: 140px;
+      height: 80px;
+      vertical-align: bottom;
+    }
+
+    .plan-cell {
+      min-width: 180px;
+      text-align: left;
+    }
+
+    @media (max-width: 768px) {
+      .report-title { font-size: 1.5rem; }
+      .form-header { grid-template-columns: 1fr 1fr; }
+      .field.small input { width: 80px; }
+      table.report-table { font-size: 0.82rem; }
+      th, td { padding: 6px 8px; }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="calc-container">
-        <input type="text" id="screen" readonly placeholder="0">
-        
-        <div class="btn-grid">
-            <button class="special" onclick="clearScreen()">AC</button>
-            <button class="special" onclick="backspace()">DEL</button>
-            <button class="special" onclick="calculatePercentage()">%</button>
-            <button class="operator" onclick="addToScreen('/')">÷</button>
-            
-            <button onclick="addToScreen('7')">7</button>
-            <button onclick="addToScreen('8')">8</button>
-            <button onclick="addToScreen('9')">9</button>
-            <button class="operator" onclick="addToScreen('*')">×</button>
-            
-            <button onclick="addToScreen('4')">4</button>
-            <button onclick="addToScreen('5')">5</button>
-            <button onclick="addToScreen('6')">6</button>
-            <button class="operator" onclick="addToScreen('-')">-</button>
-            
-            <button onclick="addToScreen('1')">1</button>
-            <button onclick="addToScreen('2')">2</button>
-            <button onclick="addToScreen('3')">3</button>
-            <button class="operator" onclick="addToScreen('+')">+</button>
-            
-            <button class="double" onclick="addToScreen('0')">0</button>
-            <button onclick="addToScreen('.')">.</button>
-            <button class="operator" onclick="calculate()">=</button>
-        </div>
+<div class="report-container">
+
+  <h1 class="report-title">CSA OPERATION SIGN-OFF REPORT</h1>
+
+  <!-- ส่วนหัว -->
+  <div class="form-header">
+    <div class="field">
+      <label>ขั้นตอนหลัก</label>
+      <input type="text">
+    </div>
+    <div class="field">
+      <label>พนักงาน</label>
+      <input type="text">
+    </div>
+    <div class="field">
+      <label>ครูฝึก</label>
+      <input type="text">
     </div>
 
-    <script>
-        const screen = document.getElementById('screen');
-        let lastInputIsOperator = false;
+    <div class="field">
+      <label>SAM</label>
+      <input type="number" step="0.01">
+    </div>
+    <div class="field small">
+      <label>เป้าหมาย Eff (%)</label>
+      <input type="number" step="0.1">
+    </div>
+    <div class="field small">
+      <label>Q'ty</label>
+      <input type="number">
+    </div>
 
-        function addToScreen(value) {
-            // ถ้ากดเครื่องหมายซ้ำ จะเปลี่ยนตัวเก่าเป็นตัวใหม่
-            if (isOperator(value) && lastInputIsOperator) {
-                screen.value = screen.value.slice(0, -1) + value;
-                return;
-            }
-            screen.value += value;
-            lastInputIsOperator = isOperator(value);
-        }
+    <div class="field">
+      <label>ระดับงาน</label>
+      <input type="text">
+    </div>
+    <div class="field">
+      <label>ชนิดผ้า</label>
+      <input type="text">
+    </div>
+    <div class="field">
+      <label>วันที่ฝึกอบรม</label>
+      <input type="date">
+    </div>
+    <div class="field">
+      <label>วันที่โอนย้าย</label>
+      <input type="date">
+    </div>
+  </div>
 
-        function isOperator(char) {
-            return ['+', '-', '*', '/'].includes(char);
-        }
+  <!-- ตารางหลัก -->
+  <div class="table-wrapper">
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th rowspan="3">วัน</th>
+          <!-- ประสิทธิภาพ -->
+          <th colspan="6" class="highlight-header">ประสิทธิภาพ</th>
+          <!-- คุณภาพ -->
+          <th colspan="3" class="highlight-header">คุณภาพ</th>
+          <!-- สาเหตุหลัก -->
+          <th colspan="3" class="highlight-header">สาเหตุหลัก</th>
+          <th rowspan="3">แผนการแก้ไข</th>
+          <th rowspan="3">ลายเซ็น<br>ผู้ปฏิบัติงาน</th>
+        </tr>
+        <tr>
+          <th class="highlight-header">เป้าหมาย<br>(%)</th>
+          <th class="highlight-header">เป้าหมาย<br>(ชิ้น)</th>
+          <th class="highlight-header">เวลาเฉลี่ยจริง<br>(วินาที)</th>
+          <th class="highlight-header">เวลาต่อรอบ<br>(นาที)</th>
+          <th class="highlight-header">ประสิทธิภาพจริง<br>(%)</th>
+          <th class="highlight-header">ประสิทธิภาพจริง<br>(ชิ้น)</th>
 
-        function clearScreen() {
-            screen.value = '';
-            lastInputIsOperator = false;
-        }
+          <th class="highlight-header">ผ่าน</th>
+          <th class="highlight-header">ไม่ผ่าน</th>
+          <th class="highlight-header">อัตราผ่าน<br>(%)</th>
 
-        function backspace() {
-            screen.value = screen.value.slice(0, -1);
-        }
+          <th class="highlight-header">คน</th>
+          <th class="highlight-header">เครื่องจักร</th>
+          <th class="highlight-header">วิธีการ</th>
+        </tr>
+      </thead>
 
-        function calculatePercentage() {
-            if (screen.value !== "") {
-                try {
-                    // คำนวณค่าปัจจุบันแล้วหาร 100 ทันที
-                    let result = eval(screen.value) / 100;
-                    screen.value = result;
-                } catch {
-                    screen.value = 'Error';
-                }
-            }
-        }
+      <tbody>
+        <!-- สร้าง 10 แถวตามแบบฟอร์ม -->
+        <tr>
+          <td class="day-cell">1</td>
+          <td></td><td></td><td></td><td></td><td></td><td></td>
+          <td></td><td></td><td></td>
+          <td></td><td></td><td></td>
+          <td class="plan-cell"></td>
+          <td class="signature-cell"></td>
+        </tr>
+        <tr>
+          <td class="day-cell">2</td>
+          <td></td><td></td><td></td><td></td><td></td><td></td>
+          <td></td><td></td><td></td>
+          <td></td><td></td><td></td>
+          <td class="plan-cell"></td>
+          <td class="signature-cell"></td>
+        </tr>
+        <!-- ทำซ้ำจนครบ 10 วัน หรือจะให้ JS generate ก็ได้ -->
+        <tr><td class="day-cell">3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td class="day-cell">4</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td class="day-cell">5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td class="day-cell">6</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td class="day-cell">7</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td class="day-cell">8</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td class="day-cell">9</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td class="day-cell">10</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
 
-        function calculate() {
-            try {
-                if (screen.value === "") return;
-                let result = eval(screen.value);
-                
-                // จัดการเรื่องทศนิยมไม่ให้ยาวเกินไป
-                if (result % 1 !== 0) {
-                    result = Math.ceil(result);
-                }
-                
-                screen.value = result.toLocaleString('en-US');
-                lastInputIsOperator = false;
-            } catch (err) {
-                screen.value = 'Error';
-            }
-        }
-    </script>
+</div>
+
 </body>
 </html>
-
-
-
-
-
-
