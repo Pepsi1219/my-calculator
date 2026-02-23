@@ -3,75 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSA Operation Sign-Off Report (v1.3.0)</title>
+    <title>CSA Operation Sign-Off Report (v1.5.0)</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+        /* CSS ส่วนใหญ่คงเดิมจาก v1.4.0 */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
         body { background: #f8f9fa; padding: 15px; }
-        .report-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.1); max-width: 1500px; margin: auto; }
+        .report-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.1); max-width: 1550px; margin: auto; }
         .report-title { text-align: center; margin-bottom: 20px; color: #1a3c6d; border-bottom: 2px solid #1a3c6d; padding-bottom: 10px; }
-        
-        /* Header Section */
         .form-header { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px 16px; margin-bottom: 20px; background: #f0f4ff; padding: 15px; border-radius: 8px; }
         .field { display: flex; flex-direction: column; }
         .field label { font-size: .85rem; margin-bottom: 4px; font-weight: 600; color: #444; }
         .field input { padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
-        .field input[readonly] { background: #e9ecef; color: #495057; }
-
-        /* Modern Stopwatch Bar */
+        .field input[readonly] { background: #e9ecef; }
+        
         .stopwatch-bar { background: #fff; border: 2px solid #1a3c6d; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px; position: sticky; top: 10px; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .timer-display { font-size: 1.8rem; font-weight: bold; font-family: monospace; background: #222; color: #00ff00; padding: 5px 15px; border-radius: 8px; border: 2px solid #444; min-width: 140px; text-align: center; }
+        .timer-display { font-size: 1.8rem; font-weight: bold; font-family: monospace; background: #222; color: #00ff00; padding: 5px 15px; border-radius: 8px; min-width: 140px; text-align: center; }
         
-        .control-group { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 5px 12px; border-radius: 8px; border: 1px solid #ddd; }
-        .control-group label { font-weight: bold; font-size: 0.9rem; color: #1a3c6d; }
-        .control-group input { width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: center; font-weight: bold; }
-
-        /* Table Style */
         .table-wrapper { overflow-x: auto; }
-        .report-table { width: 100%; border-collapse: collapse; min-width: 1350px; font-size: .85rem; }
+        .report-table { width: 100%; border-collapse: collapse; min-width: 1400px; font-size: .85rem; }
         th, td { border: 1px solid #ccc; padding: 6px; text-align: center; vertical-align: middle; }
-        th { background: #e9ecef; position: sticky; top: 0; z-index: 10; }
-        .highlight-header { background: #ffebee; }
-        .day-cell { background: #f0f4ff; font-weight: bold; width: 45px; }
+        th { background: #e9ecef; }
+        .day-cell { background: #f0f4ff; font-weight: bold; }
         
-        .report-table input { width: 100%; border: none; padding: 4px; text-align: center; background: transparent; font-size: 0.9rem; }
-        .report-table input:focus { background: #fff9c4; outline: 1px solid #1a3c6d; border-radius: 3px; }
+        /* เน้นช่องที่กดได้ */
+        .clickable-input { cursor: pointer; background: #fffde7 !important; font-weight: bold; color: #1a3c6d; border: 1px solid #ffe082 !important; border-radius: 4px; }
+        .clickable-input:hover { background: #fff9c4 !important; }
+
+        .report-table input { width: 100%; border: none; padding: 4px; text-align: center; background: transparent; }
         .report-table input[readonly] { color: #007bff; font-weight: bold; }
         
-        .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
-        .btn-start { background: #28a745; }
-        .btn-stop { background: #dc3545; }
-        .btn-save { background: #007bff; }
-        .btn-reset { background: #6c757d; }
-        .btn:active { transform: scale(0.95); }
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: white; margin: 15% auto; padding: 25px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .modal-content h3 { margin-bottom: 15px; color: #1a3c6d; }
+        .modal-content input { width: 100%; padding: 12px; font-size: 1.5rem; text-align: center; border: 2px solid #007bff; border-radius: 8px; margin-bottom: 20px; }
         
-        /* --- Signature System Styles --- */
-        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: white; margin: 10% auto; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px; text-align: center; }
-        #signature-pad { border: 2px dashed #ccc; border-radius: 8px; cursor: crosshair; touch-action: none; background: #fff; margin-bottom: 15px; }
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
+        .btn-start { background: #28a745; } .btn-stop { background: #dc3545; } .btn-save { background: #007bff; } .btn-reset { background: #6c757d; }
         .sign-btn-group { display: flex; gap: 10px; justify-content: center; }
         
-        .sign-cell { cursor: pointer; min-width: 130px; height: 55px; background: #fff; display: flex; align-items: center; justify-content: center; }
-        .sign-cell:hover { background: #f0f4ff; }
-        .sign-cell img { max-height: 50px; max-width: 100%; display: none; }
-        .placeholder-text { color: #aaa; font-size: 0.7rem; font-style: italic; }
+        .sign-cell { cursor: pointer; min-width: 120px; height: 50px; background: #fff; display: flex; align-items: center; justify-content: center; }
+        .sign-cell img { max-height: 45px; display: none; }
+        #signature-pad { border: 2px dashed #ccc; background: #fff; margin-bottom: 15px; touch-action: none; }
     </style>
 </head>
 <body>
 
 <div class="report-container">
-    <h1 class="report-title">CSA OPERATION SIGN-OFF REPORT</h1>
+    <h1 class="report-title">CSA OPERATION SIGN-OFF REPORT (v1.5.0)</h1>
 
     <div class="form-header">
-        <div class="field"><label>ขั้นตอนหลัก</label><input type="text" placeholder="ระบุขั้นตอน..."></div>
-        <div class="field"><label>พนักงาน</label><input type="text" placeholder="ชื่อ-นามสกุล"></div>
-        <div class="field"><label>ครูฝึก</label><input type="text" placeholder="ชื่อ-นามสกุล"></div>
-        <div class="field"><label>SAM (นาที)</label><input type="number" id="globalSam" step="0.001" oninput="calculateAllRows()"></div>
-        <div class="field"><label>เป้าหมาย Eff (%)</label><input type="number" id="globalEffTarget" value="100" oninput="calculateAllRows()"></div>
+        <div class="field"><label>ขั้นตอนหลัก</label><input type="text" placeholder=""></div>
+        <div class="field"><label>พนักงาน</label><input type="text" placeholder=""></div>
+        <div class="field"><label>ครูฝึก</label><input type="text" placeholder=""></div>
+        <div class="field"><label>SAM (นาที)</label><input type="number" id="globalSam" step="0.001" oninput="calculateAdaptiveGoals()"></div>
+        <div class="field"><label style="color: #d63384;">เป้าหมาย Eff (%)</label><input type="number" id="globalEffTarget" value="" oninput="calculateAdaptiveGoals()"></div>
         <div class="field"><label>เป้าหมาย Q'ty (ชิ้น/ชม.)</label><input type="number" id="globalQtyTarget" readonly></div>
-        <div class="field"><label>ระดับงาน</label><input type="text" placeholder="..."></div>
-        <div class="field"><label>ชนิดผ้า</label><input type="text" placeholder="..."></div>
+        <div class="field">
+    <label>ระดับงาน</label>
+    <select id="workLevel" style="padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; background: white;">
+        <option value="" disabled selected></option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+    </select>
+</div>
+        <div class="field"><label style="color: #d63384;">จำนวนวันที่จะต้องฝึก</label><input type="number" id="trainingDays" value="" oninput="calculateAdaptiveGoals()"></div>
+        <div class="field">
+    <label>ชนิดผ้า</label>
+    <select id="fabricType" style="padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; background: white;">
+        <option value="" disabled selected></option>
+        <option value="Knitted">ผ้าถัก (Knitted Fabric)</option>
+        <option value="Woven">ผ้าทอ (Woven Fabric)</option>
+    </select>
+</div>
         <div class="field"><label>วันที่เริ่มฝึก</label><input type="date"></div>
         <div class="field"><label>วันที่โอนย้าย</label><input type="date"></div>
+        
     </div>
 
     <div class="stopwatch-bar">
@@ -82,7 +92,7 @@
         <div id="timerDisplay" class="timer-display">00:00:00</div>
         <button class="btn btn-start" id="startStopBtn" onclick="toggleTimer()">เริ่มจับเวลา</button>
         <button class="btn btn-reset" onclick="resetTimer()">รีเซ็ต</button>
-        <div class="control-group" style="border-left: 3px solid #007bff;">
+        <div class="control-group" style="padding-left:15px; border-left:3px solid #007bff;">
             <label>รอบที่ทำได้:</label>
             <input type="number" id="cyclesDone" value="1" min="1">
         </div>
@@ -94,26 +104,18 @@
             <thead>
                 <tr>
                     <th rowspan="2">วัน</th>
-                    <th colspan="6" class="highlight-header">ประสิทธิภาพ (Performance)</th>
-                    <th colspan="3" class="highlight-header">คุณภาพ (Quality)</th>
-                    <th colspan="4" class="highlight-header">สาเหตุหลัก (Root Cause)</th>
-                    <th rowspan="2">แผนการแก้ไข / หมายเหตุ</th>
-                    <th rowspan="2">ลายเซ็นผู้ปฏิบัติงาน</th>
+                    <th colspan="6">ประสิทธิภาพ (Performance)</th>
+                    <th colspan="3">คุณภาพ (Quality)</th>
+                    <th colspan="4">สาเหตุหลัก</th>
+                    <th rowspan="2">แผนการแก้ไข</th>
+                    <th rowspan="2">ลายเซ็น</th>
                 </tr>
                 <tr>
-                    <th style="width:85px">เป้าหมาย%</th>
-                    <th style="width:85px">เป้าหมายชิ้น</th>
-                    <th style="width:95px">เวลาเฉลี่ย (วินาที)</th>
-                    <th style="width:95px">เวลาต่อรอบ (นาที)</th>
-                    <th style="width:85px">Eff %</th>
-                    <th style="width:90px">Eff ชิ้น/ชม.</th>
-                    <th style="width:75px">ผ่าน</th>
-                    <th style="width:75px">ไม่ผ่าน</th>
-                    <th style="width:90px">อัตราผ่าน %</th>
-                    <th style="width:45px">คน</th>
-                    <th style="width:45px">เครื่อง</th>
-                    <th style="width:45px">วิธี</th>
-                    <th style="width:45px">วัตถุดิบ</th>
+                    <th>เป้าหมาย%</th><th>เป้าหมายชิ้น</th>
+                    <th>เฉลี่ย (วินาที)</th><th>นาที/รอบ</th>
+                    <th>Eff %</th><th>ชิ้น/ชม.</th>
+                    <th>ผ่าน</th><th>ไม่ผ่าน</th><th>อัตราผ่าน %</th>
+                    <th>คน</th><th>เครื่อง</th><th>วิธี</th><th>วัสดุ</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -121,9 +123,21 @@
     </div>
 </div>
 
+<div id="manualInputModal" class="modal">
+    <div class="modal-content">
+        <h3>ระบุเวลาเฉลี่ย (วินาที)</h3>
+        <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">วันที่ <span id="modalDayLabel"></span></p>
+        <input type="number" id="manualSecondsInput" step="0.01" placeholder="เช่น 70.5">
+        <div class="sign-btn-group">
+            <button class="btn btn-save" onclick="saveManualSeconds()">บันทึก</button>
+            <button class="btn btn-stop" onclick="closeManualModal()">ยกเลิก</button>
+        </div>
+    </div>
+</div>
+
 <div id="signModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-bottom:15px; color:#1a3c6d;">ลงลายเซ็นผู้ปฏิบัติงาน</h3>
+        <h3>ลงลายเซ็นผู้ปฏิบัติงาน</h3>
         <canvas id="signature-pad" width="450" height="200"></canvas>
         <div class="sign-btn-group">
             <button class="btn btn-reset" onclick="clearPad()">ล้าง</button>
@@ -135,53 +149,114 @@
 
 <script>
 let startTime, timerInterval, elapsedTime = 0, isRunning = false;
-let currentSignDay = null;
+let currentActiveDay = null; // เก็บวันที่กำลังแก้ไข (ทั้งเซ็นชื่อและกรอกวินาที)
 
-// สร้างตาราง 30 วัน
+// 1. สร้างตาราง 30 วัน
 const tbody = document.getElementById("tableBody");
 for(let d=1; d<=30; d++) {
     const row = document.createElement("tr");
     row.innerHTML = `
         <td class="day-cell">${d}</td>
-        <td><input type="text" id="targetEff_${d}" readonly style="background:#f9f9f9; color:#666;"></td>
-        <td><input type="text" id="targetQty_${d}" readonly style="background:#f9f9f9; color:#666;"></td>
-        <td><input type="number" id="resAvgSec_${d}" oninput="manualCalculate(${d})" placeholder="..."></td>
+        <td><input type="text" id="targetEff_${d}" readonly></td>
+        <td><input type="text" id="targetQty_${d}" readonly></td>
+        <td><input type="text" id="resAvgSec_${d}" readonly class="clickable-input" onclick="openManualModal(${d})" placeholder="แตะเพื่อใส่"></td>
         <td><input type="text" id="resAvgMin_${d}" readonly></td>
-        <td><input type="text" id="resEffPerc_${d}" readonly></td>
+        <td><input type="text" id="resEffPerc_${d}" readonly style="background:#fff3cd;"></td>
         <td><input type="text" id="resEffPcs_${d}" readonly></td>
         <td><input type="number" id="qPass_${d}" oninput="manualCalculate(${d})"></td>
         <td><input type="number" id="qFail_${d}" oninput="manualCalculate(${d})"></td>
         <td><input type="text" id="resQRates_${d}" readonly></td>
-        <td><input type="checkbox"></td>
-        <td><input type="checkbox"></td>
-        <td><input type="checkbox"></td>
-        <td><input type="checkbox"></td>
-        <td><input type="text" style="text-align:left; padding-left:10px"></td>
-        <td class="sign-cell" onclick="openSignPad(${d})" id="signContainer_${d}">
-            <span class="placeholder-text" id="signText_${d}">แตะเพื่อเซ็น</span>
-            <img id="signImg_${d}" src="" alt="sig">
+        <td><input type="checkbox"></td><td><input type="checkbox"></td>
+        <td><input type="checkbox"></td><td><input type="checkbox"></td>
+        <td><input type="text" style="text-align:left;"></td>
+        <td class="sign-cell" onclick="openSignPad(${d})">
+            <span class="placeholder-text" id="signText_${d}">เซ็นชื่อ</span>
+            <img id="signImg_${d}" src="">
         </td>
     `;
     tbody.appendChild(row);
 }
 
-// ระบบนาฬิกาจับเวลา
+// --- ฟังก์ชันใหม่: Manual Seconds Modal ---
+function openManualModal(day) {
+    currentActiveDay = day;
+    document.getElementById('modalDayLabel').innerText = day;
+    const currentVal = document.getElementById(`resAvgSec_${day}`).value;
+    document.getElementById('manualSecondsInput').value = currentVal || "";
+    document.getElementById('manualInputModal').style.display = 'block';
+    setTimeout(() => document.getElementById('manualSecondsInput').focus(), 100);
+}
+
+function closeManualModal() {
+    document.getElementById('manualInputModal').style.display = 'none';
+}
+
+function saveManualSeconds() {
+    const sec = parseFloat(document.getElementById('manualSecondsInput').value);
+    if (!isNaN(sec) && sec >= 0) {
+        document.getElementById(`resAvgSec_${currentActiveDay}`).value = sec.toFixed(2);
+        manualCalculate(currentActiveDay); // คำนวณแถว
+        calculateAdaptiveGoals(); // คำนวณเป้าหมายใหม่ (Adaptive)
+        closeManualModal();
+    } else {
+        alert("กรุณาระบุตัวเลขที่ถูกต้อง");
+    }
+}
+
+// 2. ระบบคำนวณเป้าหมาย (Adaptive Logic) คงเดิม
+function calculateAdaptiveGoals() {
+    const globalEff = parseFloat(document.getElementById('globalEffTarget').value) || 0;
+    const trainDays = parseInt(document.getElementById('trainingDays').value) || 1;
+    const sam = parseFloat(document.getElementById('globalSam').value) || 0;
+
+    const qtyT = (sam > 0) ? Math.ceil((60 / sam) * (globalEff / 100)) : 0;
+    document.getElementById('globalQtyTarget').value = qtyT;
+
+    let lastActualEff = 0, lastActualDay = 0;
+    for (let d = 1; d <= 30; d++) {
+        let actualEffStr = document.getElementById(`resEffPerc_${d}`).value;
+        if (actualEffStr) { lastActualEff = parseFloat(actualEffStr); lastActualDay = d; }
+    }
+
+    for (let d = 1; d <= 30; d++) {
+        let targetValue = 0;
+        if (d <= lastActualDay || lastActualDay === 0) {
+            targetValue = (globalEff / trainDays) * d;
+        } else {
+            const remainingDays = trainDays - lastActualDay;
+            if (remainingDays > 0 && d <= trainDays) {
+                const increment = (globalEff - lastActualEff) / remainingDays;
+                targetValue = lastActualEff + (increment * (d - lastActualDay));
+            } else { targetValue = globalEff; }
+        }
+        const finalTarget = Math.ceil(Math.min(targetValue, globalEff));
+        const targetInput = document.getElementById(`targetEff_${d}`);
+        if (d <= trainDays || d <= lastActualDay) {
+            targetInput.value = finalTarget + "%";
+            if (sam > 0) document.getElementById(`targetQty_${d}`).value = Math.ceil((60 / sam) * (finalTarget / 100));
+        } else {
+            targetInput.value = ""; document.getElementById(`targetQty_${d}`).value = "";
+        }
+    }
+}
+
+// 3. ระบบนาฬิกา & บันทึก (แบบดั้งเดิม)
 function toggleTimer() {
     const btn = document.getElementById('startStopBtn');
     if (!isRunning) {
-        isRunning = true;
-        btn.innerText = "หยุด"; btn.className = "btn btn-stop";
+        isRunning = true; btn.innerText = "หยุด"; btn.className = "btn btn-stop";
         startTime = Date.now() - elapsedTime;
-        timerInterval = setInterval(updateTimerDisplay, 10);
+        timerInterval = setInterval(() => {
+            elapsedTime = Date.now() - startTime;
+            updateTimerDisplay();
+        }, 10);
     } else {
-        isRunning = false;
-        btn.innerText = "เริ่มต่อ"; btn.className = "btn btn-start";
+        isRunning = false; btn.innerText = "เริ่มต่อ"; btn.className = "btn btn-start";
         clearInterval(timerInterval);
     }
 }
 
 function updateTimerDisplay() {
-    elapsedTime = Date.now() - startTime;
     const totalSec = Math.floor(elapsedTime / 1000);
     const m = Math.floor(totalSec / 60).toString().padStart(2, '0');
     const s = (totalSec % 60).toString().padStart(2, '0');
@@ -197,16 +272,14 @@ function resetTimer() {
     document.getElementById('startStopBtn').className = "btn btn-start";
 }
 
-// บันทึกและคำนวณ
 function recordAndCalculate() {
     const day = document.getElementById('targetDay').value;
     const cycles = parseFloat(document.getElementById('cyclesDone').value) || 1;
-    const totalSecondsCaptured = elapsedTime / 1000;
-    const avgSecPerCycle = totalSecondsCaptured / cycles;
-    
-    document.getElementById(`resAvgSec_${day}`).value = avgSecPerCycle.toFixed(2);
+    if (elapsedTime === 0) return alert("กรุณาจับเวลาก่อน");
+    const avgSec = (elapsedTime / 1000) / cycles;
+    document.getElementById(`resAvgSec_${day}`).value = avgSec.toFixed(2);
     manualCalculate(day);
-    if(navigator.vibrate) navigator.vibrate(50);
+    calculateAdaptiveGoals();
 }
 
 function manualCalculate(d) {
@@ -225,82 +298,36 @@ function manualCalculate(d) {
         }
     }
     const totalQ = pass + fail;
-    if (totalQ > 0) {
-        document.getElementById(`resQRates_${d}`).value = Math.ceil((pass / totalQ) * 100) + "%";
-    }
+    if (totalQ > 0) document.getElementById(`resQRates_${d}`).value = Math.ceil((pass/totalQ)*100) + "%";
 }
 
-function calculateAllRows() {
-    const sam = parseFloat(document.getElementById('globalSam').value) || 0;
-    const effT = parseFloat(document.getElementById('globalEffTarget').value) || 0;
-    const qtyT = (sam > 0 && effT > 0) ? Math.ceil((60 / sam) * (effT / 100)) : 0;
-    document.getElementById('globalQtyTarget').value = qtyT;
-
-    for(let d=1; d<=30; d++) {
-        document.getElementById(`targetEff_${d}`).value = effT ? effT + "%" : "";
-        document.getElementById(`targetQty_${d}`).value = qtyT || "";
-        manualCalculate(d);
-    }
-}
-
-/* --- Signature Logic --- */
+// 4. ลายเซ็น
 const canvas = document.getElementById('signature-pad');
 const ctx = canvas.getContext('2d');
 let writing = false;
-
-function openSignPad(day) {
-    currentSignDay = day;
-    document.getElementById('signModal').style.display = 'block';
-    clearPad();
-}
-
+function openSignPad(day) { currentActiveDay = day; document.getElementById('signModal').style.display = 'block'; clearPad(); }
 function closeSignPad() { document.getElementById('signModal').style.display = 'none'; }
-
+function clearPad() { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.lineWidth = 2; ctx.strokeStyle = '#1a3c6d'; }
 function getPos(e) {
     const rect = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     return { x: clientX - rect.left, y: clientY - rect.top };
 }
-
-function startWriting(e) { 
-    writing = true; 
-    ctx.beginPath(); 
-    const pos = getPos(e); 
-    ctx.moveTo(pos.x, pos.y); 
-}
-
-function draw(e) { 
-    if(!writing) return; 
-    const pos = getPos(e); 
-    ctx.lineTo(pos.x, pos.y); 
-    ctx.stroke(); 
-    e.preventDefault(); 
-}
-
-function stopWriting() { writing = false; }
-
-canvas.addEventListener('mousedown', startWriting);
-canvas.addEventListener('mousemove', draw);
-window.addEventListener('mouseup', stopWriting);
-canvas.addEventListener('touchstart', startWriting, {passive: false});
-canvas.addEventListener('touchmove', draw, {passive: false});
-canvas.addEventListener('touchend', stopWriting);
-
-function clearPad() { 
-    ctx.clearRect(0, 0, canvas.width, canvas.height); 
-    ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#1a3c6d'; 
-}
-
+canvas.addEventListener('mousedown', (e) => { writing = true; ctx.beginPath(); const pos = getPos(e); ctx.moveTo(pos.x, pos.y); });
+canvas.addEventListener('mousemove', (e) => { if(!writing) return; const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); });
+window.addEventListener('mouseup', () => writing = false);
+canvas.addEventListener('touchstart', (e) => { writing = true; ctx.beginPath(); const pos = getPos(e); ctx.moveTo(pos.x, pos.y); e.preventDefault(); }, {passive: false});
+canvas.addEventListener('touchmove', (e) => { if(!writing) return; const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); }, {passive: false});
 function saveSignature() {
     const dataURL = canvas.toDataURL();
-    const img = document.getElementById(`signImg_${currentSignDay}`);
-    const text = document.getElementById(`signText_${currentSignDay}`);
-    img.src = dataURL;
-    img.style.display = 'block';
-    text.style.display = 'none';
+    document.getElementById(`signImg_${currentActiveDay}`).src = dataURL;
+    document.getElementById(`signImg_${currentActiveDay}`).style.display = 'block';
+    document.getElementById(`signText_${currentActiveDay}`).style.display = 'none';
     closeSignPad();
 }
+
+calculateAdaptiveGoals();
 </script>
 
 </body>
