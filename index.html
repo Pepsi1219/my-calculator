@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSA Operation Sign-Off Report (v1.2.0)</title>
+    <title>CSA Operation Sign-Off Report (v1.3.0)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
         body { background: #f8f9fa; padding: 15px; }
-        .report-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.1); max-width: 1400px; margin: auto; }
+        .report-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.1); max-width: 1500px; margin: auto; }
         .report-title { text-align: center; margin-bottom: 20px; color: #1a3c6d; border-bottom: 2px solid #1a3c6d; padding-bottom: 10px; }
         
         /* Header Section */
@@ -27,13 +27,12 @@
 
         /* Table Style */
         .table-wrapper { overflow-x: auto; }
-        .report-table { width: 100%; border-collapse: collapse; min-width: 1100px; font-size: .85rem; }
+        .report-table { width: 100%; border-collapse: collapse; min-width: 1350px; font-size: .85rem; }
         th, td { border: 1px solid #ccc; padding: 6px; text-align: center; vertical-align: middle; }
         th { background: #e9ecef; position: sticky; top: 0; z-index: 10; }
         .highlight-header { background: #ffebee; }
         .day-cell { background: #f0f4ff; font-weight: bold; width: 45px; }
         
-        /* Table Inputs */
         .report-table input { width: 100%; border: none; padding: 4px; text-align: center; background: transparent; font-size: 0.9rem; }
         .report-table input:focus { background: #fff9c4; outline: 1px solid #1a3c6d; border-radius: 3px; }
         .report-table input[readonly] { color: #007bff; font-weight: bold; }
@@ -44,6 +43,17 @@
         .btn-save { background: #007bff; }
         .btn-reset { background: #6c757d; }
         .btn:active { transform: scale(0.95); }
+        
+        /* --- Signature System Styles --- */
+        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: white; margin: 10% auto; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px; text-align: center; }
+        #signature-pad { border: 2px dashed #ccc; border-radius: 8px; cursor: crosshair; touch-action: none; background: #fff; margin-bottom: 15px; }
+        .sign-btn-group { display: flex; gap: 10px; justify-content: center; }
+        
+        .sign-cell { cursor: pointer; min-width: 130px; height: 55px; background: #fff; display: flex; align-items: center; justify-content: center; }
+        .sign-cell:hover { background: #f0f4ff; }
+        .sign-cell img { max-height: 50px; max-width: 100%; display: none; }
+        .placeholder-text { color: #aaa; font-size: 0.7rem; font-style: italic; }
     </style>
 </head>
 <body>
@@ -55,13 +65,12 @@
         <div class="field"><label>ขั้นตอนหลัก</label><input type="text" placeholder="ระบุขั้นตอน..."></div>
         <div class="field"><label>พนักงาน</label><input type="text" placeholder="ชื่อ-นามสกุล"></div>
         <div class="field"><label>ครูฝึก</label><input type="text" placeholder="ชื่อ-นามสกุล"></div>
-        <div class="field"><label>SAM (นาที)</label><input type="number" id="globalSam" step="0.000" oninput="calculateAllRows()"></div>
+        <div class="field"><label>SAM (นาที)</label><input type="number" id="globalSam" step="0.001" oninput="calculateAllRows()"></div>
         <div class="field"><label>เป้าหมาย Eff (%)</label><input type="number" id="globalEffTarget" value="100" oninput="calculateAllRows()"></div>
         <div class="field"><label>เป้าหมาย Q'ty (ชิ้น/ชม.)</label><input type="number" id="globalQtyTarget" readonly></div>
-        <div class="field"><label>ระดับงาน</label><input type="text" placeholder="ชื่อ-นามสกุล"></div>
-        <div class="field"><label>ชนิดผ้า</label><input type="text" placeholder="ชื่อ-นามสกุล"></div>
+        <div class="field"><label>ระดับงาน</label><input type="text" placeholder="..."></div>
+        <div class="field"><label>ชนิดผ้า</label><input type="text" placeholder="..."></div>
         <div class="field"><label>วันที่เริ่มฝึก</label><input type="date"></div>
-    </div>
         <div class="field"><label>วันที่โอนย้าย</label><input type="date"></div>
     </div>
 
@@ -70,17 +79,13 @@
             <label>วันที่:</label>
             <input type="number" id="targetDay" value="1" min="1" max="30">
         </div>
-
         <div id="timerDisplay" class="timer-display">00:00:00</div>
-
         <button class="btn btn-start" id="startStopBtn" onclick="toggleTimer()">เริ่มจับเวลา</button>
         <button class="btn btn-reset" onclick="resetTimer()">รีเซ็ต</button>
-
         <div class="control-group" style="border-left: 3px solid #007bff;">
             <label>รอบที่ทำได้:</label>
             <input type="number" id="cyclesDone" value="1" min="1">
         </div>
-
         <button class="btn btn-save" onclick="recordAndCalculate()">💾 บันทึกลงตาราง</button>
     </div>
 
@@ -89,42 +94,57 @@
             <thead>
                 <tr>
                     <th rowspan="2">วัน</th>
-                    <th colspan="4" class="highlight-header">ประสิทธิภาพ (Performance)</th>
+                    <th colspan="6" class="highlight-header">ประสิทธิภาพ (Performance)</th>
                     <th colspan="3" class="highlight-header">คุณภาพ (Quality)</th>
                     <th colspan="4" class="highlight-header">สาเหตุหลัก (Root Cause)</th>
                     <th rowspan="2">แผนการแก้ไข / หมายเหตุ</th>
+                    <th rowspan="2">ลายเซ็นผู้ปฏิบัติงาน</th>
                 </tr>
                 <tr>
-                    <th style="width:110px">เวลาเฉลี่ย (วินาที)</th>
-                    <th style="width:110px">เวลาต่อรอบ (นาที)</th>
-                    <th style="width:100px">Eff %</th>
-                    <th style="width:110px">Eff ชิ้น/ชม.</th>
-                    
-                    <th style="width:80px">ผ่าน</th>
-                    <th style="width:80px">ไม่ผ่าน</th>
-                    <th style="width:100px">อัตราผ่าน %</th>
-                    
-                    <th style="width:50px">คน</th>
-                    <th style="width:50px">เครื่อง</th>
-                    <th style="width:50px">วิธี</th>
-                    <th style="width:50px">วัตถุดิบ</th>
+                    <th style="width:85px">เป้าหมาย%</th>
+                    <th style="width:85px">เป้าหมายชิ้น</th>
+                    <th style="width:95px">เวลาเฉลี่ย (วินาที)</th>
+                    <th style="width:95px">เวลาต่อรอบ (นาที)</th>
+                    <th style="width:85px">Eff %</th>
+                    <th style="width:90px">Eff ชิ้น/ชม.</th>
+                    <th style="width:75px">ผ่าน</th>
+                    <th style="width:75px">ไม่ผ่าน</th>
+                    <th style="width:90px">อัตราผ่าน %</th>
+                    <th style="width:45px">คน</th>
+                    <th style="width:45px">เครื่อง</th>
+                    <th style="width:45px">วิธี</th>
+                    <th style="width:45px">วัตถุดิบ</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
+    </div>
+</div>
+
+<div id="signModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-bottom:15px; color:#1a3c6d;">ลงลายเซ็นผู้ปฏิบัติงาน</h3>
+        <canvas id="signature-pad" width="450" height="200"></canvas>
+        <div class="sign-btn-group">
+            <button class="btn btn-reset" onclick="clearPad()">ล้าง</button>
+            <button class="btn btn-save" onclick="saveSignature()">บันทึก</button>
+            <button class="btn btn-stop" onclick="closeSignPad()">ยกเลิก</button>
+        </div>
     </div>
 </div>
 
 <script>
 let startTime, timerInterval, elapsedTime = 0, isRunning = false;
+let currentSignDay = null;
 
-// เจนตาราง 30 วัน (แบบตัดช่องรวมออก)
+// สร้างตาราง 30 วัน
 const tbody = document.getElementById("tableBody");
 for(let d=1; d<=30; d++) {
     const row = document.createElement("tr");
     row.innerHTML = `
         <td class="day-cell">${d}</td>
+        <td><input type="text" id="targetEff_${d}" readonly style="background:#f9f9f9; color:#666;"></td>
+        <td><input type="text" id="targetQty_${d}" readonly style="background:#f9f9f9; color:#666;"></td>
         <td><input type="number" id="resAvgSec_${d}" oninput="manualCalculate(${d})" placeholder="..."></td>
         <td><input type="text" id="resAvgMin_${d}" readonly></td>
         <td><input type="text" id="resEffPerc_${d}" readonly></td>
@@ -137,6 +157,10 @@ for(let d=1; d<=30; d++) {
         <td><input type="checkbox"></td>
         <td><input type="checkbox"></td>
         <td><input type="text" style="text-align:left; padding-left:10px"></td>
+        <td class="sign-cell" onclick="openSignPad(${d})" id="signContainer_${d}">
+            <span class="placeholder-text" id="signText_${d}">แตะเพื่อเซ็น</span>
+            <img id="signImg_${d}" src="" alt="sig">
+        </td>
     `;
     tbody.appendChild(row);
 }
@@ -173,25 +197,15 @@ function resetTimer() {
     document.getElementById('startStopBtn').className = "btn btn-start";
 }
 
-// --- ลอจิกบันทึกและคำนวณ (Core Logic) ---
+// บันทึกและคำนวณ
 function recordAndCalculate() {
     const day = document.getElementById('targetDay').value;
     const cycles = parseFloat(document.getElementById('cyclesDone').value) || 1;
-    
-    // 1. แปลงเวลาที่จับได้เป็นวินาทีรวม
     const totalSecondsCaptured = elapsedTime / 1000;
-    
-    // 2. คำนวณเวลาเฉลี่ย (วินาทีรวม / จำนวนรอบ)
     const avgSecPerCycle = totalSecondsCaptured / cycles;
     
-    // 3. ส่งค่าไปที่ตารางช่อง "เวลาเฉลี่ย (วินาที)"
-    const targetInput = document.getElementById(`resAvgSec_${day}`);
-    targetInput.value = avgSecPerCycle.toFixed(2);
-    
-    // 4. สั่งคำนวณส่วนที่เหลือในแถวนั้น
+    document.getElementById(`resAvgSec_${day}`).value = avgSecPerCycle.toFixed(2);
     manualCalculate(day);
-    
-    // สั่นแจ้งเตือน (ถ้าเปิดในมือถือ)
     if(navigator.vibrate) navigator.vibrate(50);
 }
 
@@ -204,33 +218,88 @@ function manualCalculate(d) {
     if (avgSec > 0) {
         const avgMin = avgSec / 60;
         document.getElementById(`resAvgMin_${d}`).value = avgMin.toFixed(2);
-
         if (sam > 0) {
-            // สูตร: (SAM / Actual Min) * 100
             const eff = Math.ceil((sam / avgMin) * 100);
             document.getElementById(`resEffPerc_${d}`).value = eff + "%";
-            // สูตร: 60 / Actual Min
             document.getElementById(`resEffPcs_${d}`).value = Math.ceil(60 / avgMin);
         }
     }
-
-    // คุณภาพ
     const totalQ = pass + fail;
     if (totalQ > 0) {
-        const qRate = Math.ceil((pass / totalQ) * 100);
-        document.getElementById(`resQRates_${d}`).value = qRate + "%";
+        document.getElementById(`resQRates_${d}`).value = Math.ceil((pass / totalQ) * 100) + "%";
     }
 }
 
 function calculateAllRows() {
-    // อัปเดตเป้าหมายใน Header
     const sam = parseFloat(document.getElementById('globalSam').value) || 0;
     const effT = parseFloat(document.getElementById('globalEffTarget').value) || 0;
-    if (sam > 0 && effT > 0) {
-        document.getElementById('globalQtyTarget').value = Math.ceil((60 / sam) * (effT / 100));
+    const qtyT = (sam > 0 && effT > 0) ? Math.ceil((60 / sam) * (effT / 100)) : 0;
+    document.getElementById('globalQtyTarget').value = qtyT;
+
+    for(let d=1; d<=30; d++) {
+        document.getElementById(`targetEff_${d}`).value = effT ? effT + "%" : "";
+        document.getElementById(`targetQty_${d}`).value = qtyT || "";
+        manualCalculate(d);
     }
-    // รีคำนวณทุกแถว
-    for(let d=1; d<=30; d++) manualCalculate(d);
+}
+
+/* --- Signature Logic --- */
+const canvas = document.getElementById('signature-pad');
+const ctx = canvas.getContext('2d');
+let writing = false;
+
+function openSignPad(day) {
+    currentSignDay = day;
+    document.getElementById('signModal').style.display = 'block';
+    clearPad();
+}
+
+function closeSignPad() { document.getElementById('signModal').style.display = 'none'; }
+
+function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: clientX - rect.left, y: clientY - rect.top };
+}
+
+function startWriting(e) { 
+    writing = true; 
+    ctx.beginPath(); 
+    const pos = getPos(e); 
+    ctx.moveTo(pos.x, pos.y); 
+}
+
+function draw(e) { 
+    if(!writing) return; 
+    const pos = getPos(e); 
+    ctx.lineTo(pos.x, pos.y); 
+    ctx.stroke(); 
+    e.preventDefault(); 
+}
+
+function stopWriting() { writing = false; }
+
+canvas.addEventListener('mousedown', startWriting);
+canvas.addEventListener('mousemove', draw);
+window.addEventListener('mouseup', stopWriting);
+canvas.addEventListener('touchstart', startWriting, {passive: false});
+canvas.addEventListener('touchmove', draw, {passive: false});
+canvas.addEventListener('touchend', stopWriting);
+
+function clearPad() { 
+    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#1a3c6d'; 
+}
+
+function saveSignature() {
+    const dataURL = canvas.toDataURL();
+    const img = document.getElementById(`signImg_${currentSignDay}`);
+    const text = document.getElementById(`signText_${currentSignDay}`);
+    img.src = dataURL;
+    img.style.display = 'block';
+    text.style.display = 'none';
+    closeSignPad();
 }
 </script>
 
