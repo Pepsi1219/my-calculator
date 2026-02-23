@@ -97,7 +97,14 @@
   
      <div class="control-group">
          <label>วัน/ชั่วโมงที่:</label>
-         <input type="number" id="targetDay" value="1" min="1" max="30" inputmode="numeric" style="width: 60px; text-align: center; border: 0px solid #007bff; font-weight: bold;">
+         <input type="number"
+                id="targetDay"
+                value="1"
+                min="1"
+                max="30"
+                inputmode="numeric"
+                style="width: 60px; text-align: center;
+                       border: 0px solid #007bff; font-weight: bold;">
         </div>
 
     <div class="table-wrapper">
@@ -203,6 +210,8 @@ for(let d=1; d<=30; d++) {
     tbody.appendChild(row);
 }
 
+ 
+  
 function updateAutoTargetDay() {
     let lastDayWithData = 0;
     for (let d = 1; d <= 30; d++) {
@@ -363,13 +372,35 @@ function resetTimer() {
 }
 
 function recordAndCalculate() {
+    // ดึงค่าวัน/ชั่วโมงที่จาก input
     const day = document.getElementById('targetDay').value;
-    const cycles = parseFloat(document.getElementById('cyclesDone').value) || 1;
+    
+    // ตรวจสอบว่ามีการจับเวลาหรือยัง
     if (elapsedTime === 0) return alert("กรุณาจับเวลาก่อน");
+
+    // ตรวจสอบช่อง cyclesDone (ถ้าไม่มีให้ default เป็น 1 เพื่อไม่ให้เกิด Error)
+    const cyclesElem = document.getElementById('cyclesDone');
+    const cycles = cyclesElem ? (parseFloat(cyclesElem.value) || 1) : 1;
+    
+    // คำนวณวินาทีเฉลี่ย
     const avgSec = (elapsedTime / 1000) / cycles;
-    document.getElementById(`resAvgSec_${day}`).value = avgSec.toFixed(2);
-    manualCalculate(day);
-    updateAutoTargetDay();
+    
+    // บันทึกลงในช่อง "เวลาเฉลี่ยจริง (วินาที)" ของแถวนั้นๆ
+    const targetInput = document.getElementById(`resAvgSec_${day}`);
+    if (targetInput) {
+        targetInput.value = avgSec.toFixed(2);
+        
+        // เรียกฟังก์ชันคำนวณผลลัพธ์อื่นๆ ในแถว
+        manualCalculate(day);
+        
+        // เลื่อนเลขวันที่ในช่อง "วัน/ชั่วโมงที่" ไปยังวันถัดไปอัตโนมัติ
+        updateAutoTargetDay();
+        
+        // รีเซ็ตนาฬิกาให้เป็น 0 เพื่อเริ่มจับเวลารอบใหม่
+        resetTimer(); 
+    } else {
+        alert("ไม่พบแถวที่ระบุในตาราง");
+    }
 }
 
 // ลายเซ็น
