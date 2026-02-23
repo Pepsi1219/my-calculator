@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSA Operation Sign-Off Report</title>
+    <title>CSA Operation Sign-Off Report (v1.9.0)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
         body { background: #f8f9fa; padding: 15px; }
@@ -15,12 +15,21 @@
         .field input, .field select { padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; background: white; }
         .field input[readonly] { background: #e9ecef; }
         
-        .stopwatch-bar { background: #fff; border: 2px solid #1a3c6d; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px; position: sticky; top: 10px; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .stopwatch-bar { background: #fff; border: 0px solid #1a3c6d; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px; position: sticky; top: 10px; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .timer-display { font-size: 1.8rem; font-weight: bold; font-family: monospace; background: #222; color: #00ff00; padding: 5px 15px; border-radius: 8px; min-width: 140px; text-align: center; }
         
         .table-wrapper { overflow-x: auto; }
-        .report-table { width: 100%; border-collapse: collapse; min-width: 1400px; font-size: .85rem; }
-        th, td { border: 1px solid #ccc; padding: 6px; text-align: center; vertical-align: middle; }
+        .report-table {
+          width: 100%;
+          border-collapse: collapse;
+          min-width: 1400px;
+          font-size: .75rem;
+          table-layout: fixed;
+      }
+        .cause-col {
+          width: 40px;
+      }
+        th, td { border: .5px solid #ccc; padding: 6px; text-align: center; vertical-align: middle; }
         th { background: #e9ecef; }
         .day-cell { background: #f0f4ff; font-weight: bold; }
         .clickable-input { cursor: pointer; background: #fffde7 !important; font-weight: bold; color: #1a3c6d; border: 1px solid #ffe082 !important; border-radius: 4px; }
@@ -76,35 +85,59 @@
     </div>
 
     <div class="stopwatch-bar">
-        <div class="control-group">
-            <label>วัน/ชั่วโมงที่:</label>
-            <input type="number" id="targetDay" value="1" min="1" max="30" inputmode="numeric" style="width: 60px; text-align: center; border: 1px solid #007bff; font-weight: bold;">
-        </div>
+        
         <div id="timerDisplay" class="timer-display">00:00:00</div>
-        <button class="btn btn-start" id="startStopBtn" onclick="toggleTimer()">เริ่มจับเวลา</button>
-        <button class="btn btn-reset" onclick="resetTimer()">รีเซ็ต</button>
+        <button class="btn btn-start" id="startStopBtn" onclick="toggleTimer()">Start</button>
+        <button class="btn btn-reset" onclick="resetTimer()">Reset</button>
         <div class="control-group" style="padding-left:15px; border-left:3px solid #007bff;">
         </div>
-        <button class="btn btn-save" onclick="recordAndCalculate()">💾 บันทึกลงตาราง</button>
+        <button class="btn btn-save" onclick="recordAndCalculate()">💾 Save</button>
     </div>
+  
+  
+     <div class="control-group">
+         <label>วัน/ชั่วโมงที่:</label>
+         <input type="number" id="targetDay" value="1" min="1" max="30" inputmode="numeric" style="width: 60px; text-align: center; border: 0px solid #007bff; font-weight: bold;">
+        </div>
 
     <div class="table-wrapper">
         <table class="report-table">
+            <table class="report-table">
+              <colgroup>
+                <col style="width:60px">
+                <col span="6">
+                <col span="3">
+                <col class="cause-col">
+                <col class="cause-col">
+                <col class="cause-col">
+                <col class="cause-col">
+                <col style="width:180px">
+                <col style="width:140px">
+         </colgroup>
+              
             <thead>
                 <tr>
                     <th rowspan="2">วัน</th>
-                    <th colspan="6">ประสิทธิภาพ (Performance)</th>
-                    <th colspan="3">คุณภาพ (Quality)</th>
+                    <th colspan="6">ประสิทธิภาพ</th>
+                    <th colspan="3">คุณภาพ</th>
                     <th colspan="4">สาเหตุหลัก</th>
                     <th rowspan="2">แผนการแก้ไข</th>
                     <th rowspan="2">ลายเซ็น</th>
                 </tr>
                 <tr>
-                    <th>เป้าหมาย%</th><th>เป้าหมายชิ้น</th>
-                    <th>เฉลี่ย (วินาที)</th><th>นาที/รอบ</th>
-                    <th>Eff %</th><th>ชิ้น/ชม.</th>
-                    <th>ผ่าน</th><th>ไม่ผ่าน</th><th>อัตราผ่าน %</th>
-                    <th>คน</th><th>เครื่อง</th><th>วิธี</th><th>วัสดุ</th>
+                    <th>เป้าหมายประสิทธิภาพ (%)</th>
+                    <th> เป้าหมายประสิทธิภาพ (ชิ้น)</th>
+                    <th> เวลาเฉลี่ยจริง (วินาที)</th>
+                    <th>เวลาต่อรอบจริง (นาที)</th>
+                    <th>ประสิทธิภาพจริง (%)</th>
+                    <th>ประสิทธิภาพจริง (ชิ้น)</th>
+                    <th>ผ่าน</th>
+                    <th>ไม่ผ่าน</th>
+                    <th>อัตราผ่าน %</th>
+                    <th>คน</th>
+                    <th>เครื่อง</th>
+                    <th>วิธีการ</th>
+                    <th>วัสดุ</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -116,22 +149,27 @@
     <div class="modal-content">
         <h3>ระบุเวลาเฉลี่ย (วินาที)</h3>
         <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">วันที่ <span id="modalDayLabel"></span></p>
-        <input type="number" id="manualSecondsInput" step="0.01" inputmode="decimal" placeholder="เช่น 70.5">
+        <input type="number" id="manualSecondsInput" step="0.01" inputmode="decimal" placeholder="00">
         <div class="sign-btn-group">
-            <button class="btn btn-save" onclick="saveManualSeconds()">บันทึก</button>
-            <button class="btn btn-stop" onclick="closeManualModal()">ยกเลิก</button>
+            <button class="btn btn-save" 
+             onclick="saveManualSeconds()">บันทึก</button>
+            <button class="btn btn-stop" 
+             onclick="closeManualModal()">ยกเลิก</button>
         </div>
     </div>
 </div>
 
 <div id="signModal" class="modal">
     <div class="modal-content">
-        <h3>ลงลายเซ็นผู้ปฏิบัติงาน</h3>
+        <h3>ลงลายเซ็น</h3>
         <canvas id="signature-pad" width="450" height="200"></canvas>
         <div class="sign-btn-group">
-            <button class="btn btn-reset" onclick="clearPad()">ล้าง</button>
-            <button class="btn btn-save" onclick="saveSignature()">บันทึก</button>
-            <button class="btn btn-stop" onclick="closeSignPad()">ยกเลิก</button>
+            <button class="btn btn-reset" 
+                    onclick="clearPad()">ล้าง</button>
+            <button class="btn btn-save" 
+                    onclick="saveSignature()">บันทึก</button>
+            <button class="btn btn-stop" 
+                    onclick="closeSignPad()">ยกเลิก</button>
         </div>
     </div>
 </div>
@@ -297,14 +335,14 @@ function manualCalculate(d) {
 function toggleTimer() {
     const btn = document.getElementById('startStopBtn');
     if (!isRunning) {
-        isRunning = true; btn.innerText = "หยุด"; btn.className = "btn btn-stop";
+        isRunning = true; btn.innerText = "Stop"; btn.className = "btn btn-stop";
         startTime = Date.now() - elapsedTime;
         timerInterval = setInterval(() => {
             elapsedTime = Date.now() - startTime;
             updateTimerDisplay();
         }, 10);
     } else {
-        isRunning = false; btn.innerText = "เริ่มต่อ"; btn.className = "btn btn-start";
+        isRunning = false; btn.innerText = "Continue"; btn.className = "btn btn-start";
         clearInterval(timerInterval);
     }
 }
@@ -365,4 +403,8 @@ updateAutoTargetDay();
 </script>
 
 </body>
+  <footer style="text-align: center; padding: 20px; color: #888; font-size: 12px; font-family: sans-serif;">
+    <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 10px;">
+    <p>© CSA OPERATION SIGN-OFF REPORT  | v1.0.10</p>
+</footer>
 </html>
