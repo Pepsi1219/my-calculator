@@ -60,35 +60,10 @@
           background: #e9ecef; 
       }
         
-        .stopwatch-bar { 
-          background: #fff; 
-          border: 0px solid #1a3c6d; 
-          padding: 12px; 
-          border-radius: 12px; 
-          margin-bottom: 20px; 
-          display: flex; 
-          flex-wrap: wrap; 
-          align-items: center; 
-          justify-content: center; 
-          gap: 15px; 
-          position: sticky;
-          top: 10px; 
-          z-index: 100; 
-          box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+        .table-wrapper { 
+          overflow-x: auto; 
       }
-        .timer-display { 
-          font-size: 1.8rem; 
-          font-weight: bold; 
-          font-family: monospace; 
-          background: #222; 
-          color: #00ff00; 
-          padding: 5px 15px; 
-          border-radius: 8px; 
-          min-width: 140px; 
-          text-align: center; 
-      }
-        
-        .table-wrapper { overflow-x: auto; }
+      
         .report-table {
           width: 100%;
           border-collapse: collapse;
@@ -173,6 +148,33 @@
           margin-bottom: 20px; 
       }
         
+       .stopwatch-bar { 
+         background: #fff; 
+         border: 0px solid #1a3c6d; 
+         padding: 12px; 
+         border-radius: 12px; 
+         margin-bottom: 20px; 
+         display: flex; 
+         flex-wrap: wrap; 
+         align-items: center; 
+         justify-content: flex-end;
+         gap: 15px; 
+         position: sticky;
+         top: 10px; 
+         z-index: 100; 
+         box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+      }
+        .timer-display { 
+          font-size: 1.8rem; 
+          font-weight: bold; 
+          font-family: monospace; 
+          background: #222; 
+          color: #00ff00; 
+          padding: 5px 15px; 
+          border-radius: 8px; 
+          min-width: 140px; 
+          text-align: center; 
+      }
         .btn { 
           padding: 10px 16px; 
           border: none; 
@@ -194,7 +196,7 @@
       } 
         .btn-save { 
         background: #007bff; 
-      } 
+      }
        .btn-reset { 
          background: #6c757d;
       }
@@ -230,40 +232,97 @@
 
 <div class="report-container">
     <h1 class="report-title">CSA OPERATION SIGN-OFF REPORT</h1>
+  
+  <button class="btn btn-reset" 
+          onclick="clearAllData()" 
+          style="background: #dc3545;
+                 margin-left: auto;">🗑️ Clear All
+  </button>
 
     <div class="form-header">
-        <div class="field"><label>ขั้นตอนหลัก</label><input type="text"></div>
-        <div class="field"><label>พนักงาน</label><input type="text"></div>
-        <div class="field"><label>ครูฝึก</label><input type="text"></div>
-        <div class="field"><label>SAM (นาที)</label><input type="number" id="globalSam" step="0.001" inputmode="decimal" oninput="calculateAdaptiveGoals()"></div>
-        <div class="field"><label>เป้าหมาย Eff (%)</label><input type="number" id="globalEffTarget" inputmode="numeric" oninput="calculateAdaptiveGoals()"></div>
-        <div class="field"><label>เป้าหมาย Q'ty (ชิ้น/ชม.)</label><input type="number" id="globalQtyTarget" readonly></div>
+        <div class="field"><label>ขั้นตอนหลัก</label>
+          <input type="text"></div>
+      
+        <div class="field"><label>พนักงาน</label>
+          <input type="text"></div>
+      
+        <div class="field"><label>ครูฝึก</label>
+          <input type="text"></div>
+      
+        <div class="field"><label>SAM (นาที)</label>
+          <input type="number" 
+                 id="globalSam" 
+                 step="0.001" 
+                 inputmode="decimal" 
+                 oninput="calculateAdaptiveGoals()">
+      </div>
+      
+        <div class="field"><label>เป้าหมาย Eff (%)</label>
+          <input type="number" 
+                 id="globalEffTarget" 
+                 inputmode="numeric" 
+                 oninput="calculateAdaptiveGoals()">
+      </div>
+      
+        <div class="field">
+          <label>เป้าหมาย Q'ty (ชิ้น/ชม.)</label>
+          <input type="number" 
+                 id="globalQtyTarget" 
+                 readonly>
+      </div>
         <div class="field">
             <label>ระดับงาน</label>
             <select id="workLevel">
-                <option value="" disabled selected></option>
-                <option value="A">A</option><option value="B">B</option>
-                <option value="C">C</option><option value="D">D</option>
+              <option value="" 
+                      disabled selected> </option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
             </select>
         </div>
-        <div class="field"><label>จำนวนวันที่จะต้องฝึก</label><input type="number" id="trainingDays" inputmode="numeric" oninput="calculateAdaptiveGoals()"></div>
+      
+        <div class="field"><label>จำนวนวันที่จะต้องฝึก</label>
+          <input type="number" 
+                 id="trainingDays" 
+                 inputmode="numeric" 
+                 oninput="calculateAdaptiveGoals()">
+      </div>
+      
         <div class="field">
             <label>ชนิดผ้า</label>
             <select id="fabricType">
-                <option value="" disabled selected></option>
-                <option value="Knitted">ผ้าถัก (Knitted Fabric)</option>
-                <option value="Woven">ผ้าทอ (Woven Fabric)</option>
+                <option value="" 
+                        disabled selected></option>
+                <option value="Knitted">ผ้าถัก (Knitted)</option>
+                <option value="Woven">ผ้าทอ (Woven)</option>
             </select>
         </div>
-        <div class="field"><label>วันที่เริ่มฝึก</label><input type="date"></div>
-        <div class="field"><label>วันที่โอนย้าย</label><input type="date"></div>
+      
+        <div class="field"><label>วันที่เริ่มฝึก</label>
+          <input type="date"></div>
+      
+        <div class="field">
+          <label>วันที่โอนย้าย</label>
+          <input type="date">
+          </div>
     </div>
-
+  
     <div class="stopwatch-bar">
-        
-        <div id="timerDisplay" class="timer-display">00:00:00</div>
-        <button class="btn btn-start" id="startStopBtn" onclick="toggleTimer()">Start</button>
-        <button class="btn btn-reset" onclick="resetTimer()">Reset</button>
+      
+      <div id="timerDisplay" 
+           class="timer-display">00:00:00
+      </div>
+      
+        <button class="btn btn-start" 
+                id="startStopBtn" 
+                onclick="toggleTimer()">Start
+      </button>
+      
+        <button class="btn btn-reset" 
+                onclick="resetTimer()">Reset
+      </button>
+      
         <div class="control-group" style="padding-left:15px; border-left:3px solid #007bff;">
         </div>
         <button class="btn btn-save" onclick="recordAndCalculate()">💾 Save</button>
@@ -357,6 +416,63 @@
 </div>
 
 <script>
+function clearAllData() {
+    if (confirm("คุณต้องการลบข้อมูลทั้งหมดในฟอร์มนี้ใช่หรือไม่? ข้อมูลที่ลบแล้วไม่สามารถเรียกคืนได้")) {
+        // 1. เคลียร์ข้อมูลใน Form Header (input ทั่วไป)
+        const headerInputs = document.querySelectorAll('.form-header input, .form-header select');
+        headerInputs.forEach(input => {
+            if (input.type === 'date' || input.type === 'number' || input.type === 'text') {
+                input.value = "";
+            } else if (input.tagName === 'SELECT') {
+                input.selectedIndex = 0;
+            }
+        });
+
+        // 2. เคลียร์ข้อมูลในตารางทั้ง 30 แถว
+        for (let d = 1; d <= 30; d++) {
+    const rowInputs = document.querySelectorAll(`#tableBody tr:nth-child(${d}) input`);
+    rowInputs.forEach(input => {
+        if (input.type === 'checkbox') {
+            input.checked = false;
+        } else {
+            input.value = "";
+        }
+
+        // แก้ไขตรงนี้: ล้าง Class สีแจ้งเตือน แต่คง Class ไฮไลท์ของช่องวินาทีไว้
+        if (input.id === `resAvgSec_${d}`) {
+            input.className = "clickable-input"; // คืนค่าไฮไลท์สีเหลือง
+        } else {
+            input.className = ""; // ล้าง class ของช่องอื่นๆ
+        }
+    });
+
+            // ล้างลายเซ็น
+            const signImg = document.getElementById(`signImg_${d}`);
+            const signText = document.getElementById(`signText_${d}`);
+            if (signImg) {
+                signImg.src = "";
+                signImg.style.display = 'none';
+            }
+            if (signText) {
+                signText.style.display = 'block';
+            }
+        }
+
+        // 3. รีเซ็ตนาฬิกาและตัวเลขวันเริ่มต้น
+        resetTimer();
+        document.getElementById('targetDay').value = 1;
+        
+        // 4. คำนวณ Goal ใหม่ (เพื่อให้ค่าว่างเปล่าแสดงผลถูกต้อง)
+        calculateAdaptiveGoals();
+        
+        alert("ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว");
+    }
+} 
+  
+  
+  
+  
+  
 let startTime, timerInterval, elapsedTime = 0, isRunning = false;
 let currentActiveDay = null;
 
@@ -367,7 +483,7 @@ for(let d=1; d<=30; d++) {
         <td class="day-cell">${d}</td>
         <td><input type="text" id="targetEff_${d}" readonly></td>
         <td><input type="text" id="targetQty_${d}" readonly></td>
-        <td><input type="text" id="resAvgSec_${d}" readonly class="clickable-input" onclick="openManualModal(${d})" placeholder="แตะ"></td>
+        <td><input type="text" id="resAvgSec_${d}" readonly class="clickable-input" onclick="openManualModal(${d})" placeholder=""></td>
         <td><input type="text" id="resAvgMin_${d}" readonly></td>
         <td><input type="text" id="resEffPerc_${d}" readonly style="background:#fff3cd;"></td>
         <td><input type="text" id="resEffPcs_${d}" readonly></td>
@@ -602,6 +718,7 @@ function saveSignature() {
 
 calculateAdaptiveGoals();
 updateAutoTargetDay();
+
 </script>
 
 </body>
