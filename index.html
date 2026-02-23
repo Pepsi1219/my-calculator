@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSA Operation Sign-Off Report (v1.6.0)</title>
+    <title>CSA Operation Sign-Off Report</title>
     <style>
-        /* CSS ส่วนใหญ่คงเดิมเพื่อความต่อเนื่อง */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
         body { background: #f8f9fa; padding: 15px; }
         .report-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.1); max-width: 1550px; margin: auto; }
@@ -25,10 +24,11 @@
         th { background: #e9ecef; }
         .day-cell { background: #f0f4ff; font-weight: bold; }
         .clickable-input { cursor: pointer; background: #fffde7 !important; font-weight: bold; color: #1a3c6d; border: 1px solid #ffe082 !important; border-radius: 4px; }
-
         .report-table input { width: 100%; border: none; padding: 4px; text-align: center; background: transparent; }
-        .report-table input[readonly] { color: #007bff; font-weight: bold; }
         
+        .text-success { color: #28a745 !important; font-weight: bold; }
+        .text-danger { color: #dc3545 !important; font-weight: bold; }
+
         .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
         .modal-content { background: white; margin: 15% auto; padding: 25px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; }
         .modal-content input { width: 100%; padding: 12px; font-size: 1.5rem; text-align: center; border: 2px solid #007bff; border-radius: 8px; margin-bottom: 20px; }
@@ -45,14 +45,14 @@
 <body>
 
 <div class="report-container">
-    <h1 class="report-title">CSA OPERATION SIGN-OFF REPORT (v1.6.0)</h1>
+    <h1 class="report-title">CSA OPERATION SIGN-OFF REPORT</h1>
 
     <div class="form-header">
         <div class="field"><label>ขั้นตอนหลัก</label><input type="text"></div>
         <div class="field"><label>พนักงาน</label><input type="text"></div>
         <div class="field"><label>ครูฝึก</label><input type="text"></div>
         <div class="field"><label>SAM (นาที)</label><input type="number" id="globalSam" step="0.001" inputmode="decimal" oninput="calculateAdaptiveGoals()"></div>
-        <div class="field"><label style="color: #d63384;">เป้าหมาย Eff (%)</label><input type="number" id="globalEffTarget" inputmode="numeric" oninput="calculateAdaptiveGoals()"></div>
+        <div class="field"><label>เป้าหมาย Eff (%)</label><input type="number" id="globalEffTarget" inputmode="numeric" oninput="calculateAdaptiveGoals()"></div>
         <div class="field"><label>เป้าหมาย Q'ty (ชิ้น/ชม.)</label><input type="number" id="globalQtyTarget" readonly></div>
         <div class="field">
             <label>ระดับงาน</label>
@@ -62,7 +62,7 @@
                 <option value="C">C</option><option value="D">D</option>
             </select>
         </div>
-        <div class="field"><label style="color: #d63384;">จำนวนวันที่จะต้องฝึก</label><input type="number" id="trainingDays" inputmode="numeric" oninput="calculateAdaptiveGoals()"></div>
+        <div class="field"><label>จำนวนวันที่จะต้องฝึก</label><input type="number" id="trainingDays" inputmode="numeric" oninput="calculateAdaptiveGoals()"></div>
         <div class="field">
             <label>ชนิดผ้า</label>
             <select id="fabricType">
@@ -77,15 +77,13 @@
 
     <div class="stopwatch-bar">
         <div class="control-group">
-            <label>วันที่:</label>
+            <label>วัน/ชั่วโมงที่:</label>
             <input type="number" id="targetDay" value="1" min="1" max="30" inputmode="numeric" style="width: 60px; text-align: center; border: 1px solid #007bff; font-weight: bold;">
         </div>
         <div id="timerDisplay" class="timer-display">00:00:00</div>
         <button class="btn btn-start" id="startStopBtn" onclick="toggleTimer()">เริ่มจับเวลา</button>
         <button class="btn btn-reset" onclick="resetTimer()">รีเซ็ต</button>
         <div class="control-group" style="padding-left:15px; border-left:3px solid #007bff;">
-            <label>รอบที่ทำได้:</label>
-            <input type="number" id="cyclesDone" value="1" min="1" inputmode="numeric" style="width: 60px; text-align: center;">
         </div>
         <button class="btn btn-save" onclick="recordAndCalculate()">💾 บันทึกลงตาราง</button>
     </div>
@@ -142,7 +140,6 @@
 let startTime, timerInterval, elapsedTime = 0, isRunning = false;
 let currentActiveDay = null;
 
-// 1. สร้างตาราง 30 วัน
 const tbody = document.getElementById("tableBody");
 for(let d=1; d<=30; d++) {
     const row = document.createElement("tr");
@@ -168,7 +165,6 @@ for(let d=1; d<=30; d++) {
     tbody.appendChild(row);
 }
 
-// ฟังก์ชันใหม่: หาค่าวันล่าสุดที่มีข้อมูลและอัปเดตช่อง "วันที่"
 function updateAutoTargetDay() {
     let lastDayWithData = 0;
     for (let d = 1; d <= 30; d++) {
@@ -176,7 +172,6 @@ function updateAutoTargetDay() {
             lastDayWithData = d;
         }
     }
-    // ตั้งค่าเป้าหมายวันถัดไป (แต่ไม่เกิน 30)
     let nextDay = lastDayWithData + 1;
     if (nextDay > 30) nextDay = 30;
     document.getElementById('targetDay').value = nextDay;
@@ -200,54 +195,105 @@ function saveManualSeconds() {
     if (!isNaN(sec) && sec >= 0) {
         document.getElementById(`resAvgSec_${currentActiveDay}`).value = sec.toFixed(2);
         manualCalculate(currentActiveDay);
-        calculateAdaptiveGoals();
-        updateAutoTargetDay(); // << อัปเดตวันที่อัตโนมัติ
+        updateAutoTargetDay();
         closeManualModal();
     } else {
         alert("กรุณาระบุตัวเลขที่ถูกต้อง");
     }
 }
 
+// --- Adaptive Logic (v1.9.0: จำกัดการแสดงผลตาม "จำนวนวันที่จะต้องฝึก") ---
 function calculateAdaptiveGoals() {
     const globalEff = parseFloat(document.getElementById('globalEffTarget').value) || 0;
-    const trainDays = parseInt(document.getElementById('trainingDays').value) || 1;
+    const trainDays = parseInt(document.getElementById('trainingDays').value) || 0; // รับค่าจากช่องจำนวนวัน
     const sam = parseFloat(document.getElementById('globalSam').value) || 0;
 
     const qtyT = (sam > 0) ? Math.ceil((60 / sam) * (globalEff / 100)) : 0;
     document.getElementById('globalQtyTarget').value = qtyT;
 
+    let firstDayQ100 = 0;
+    for (let d = 1; d <= 30; d++) {
+        if (document.getElementById(`resQRates_${d}`).value === "100%") {
+            firstDayQ100 = d;
+            break; 
+        }
+    }
+
     let lastActualEff = 0, lastActualDay = 0;
     for (let d = 1; d <= 30; d++) {
-        let actualEffStr = document.getElementById(`resEffPerc_${d}`).value;
-        if (actualEffStr) { 
-            lastActualEff = parseFloat(actualEffStr); 
+        let effStr = document.getElementById(`resEffPerc_${d}`).value;
+        if (effStr) { 
+            lastActualEff = parseFloat(effStr); 
             lastActualDay = d; 
         }
     }
 
     for (let d = 1; d <= 30; d++) {
-        let targetValue = 0;
-        if (d <= lastActualDay || lastActualDay === 0) {
-            targetValue = (globalEff / trainDays) * d;
-        } else {
-            const remainingDays = trainDays - lastActualDay;
-            if (remainingDays > 0 && d <= trainDays) {
-                const increment = (globalEff - lastActualEff) / remainingDays;
-                targetValue = lastActualEff + (increment * (d - lastActualDay));
-            } else { targetValue = globalEff; }
-        }
-        const finalTarget = Math.ceil(Math.min(targetValue, globalEff));
         const targetInput = document.getElementById(`targetEff_${d}`);
-        if (d <= trainDays || d <= lastActualDay) {
-            targetInput.value = finalTarget + "%";
-            if (sam > 0) document.getElementById(`targetQty_${d}`).value = Math.ceil((60 / sam) * (finalTarget / 100));
+        const targetQtyInput = document.getElementById(`targetQty_${d}`);
+        const effInput = document.getElementById(`resEffPerc_${d}`);
+        
+        let targetValue = 0;
+        let showTarget = false;
+
+        // เงื่อนไข v1.9.0: แสดงผลเมื่อ (เข้าเงื่อนไข Q100) AND (ไม่เกินจำนวนวันฝึกที่กำหนด)
+        if (firstDayQ100 > 0 && d > firstDayQ100 && d <= trainDays) {
+            showTarget = true;
+            if (d <= lastActualDay) {
+                targetValue = (globalEff / trainDays) * d; 
+            } else {
+                const remainingDays = trainDays - lastActualDay;
+                if (remainingDays > 0) {
+                    const increment = (globalEff - lastActualEff) / remainingDays;
+                    targetValue = lastActualEff + (increment * (d - lastActualDay));
+                } else { targetValue = globalEff; }
+            }
+        }
+
+        if (showTarget) {
+            const finalT = Math.ceil(Math.min(targetValue, globalEff));
+            targetInput.value = finalT + "%";
+            if (sam > 0) targetQtyInput.value = Math.ceil((60 / sam) * (finalT / 100));
         } else {
-            targetInput.value = ""; document.getElementById(`targetQty_${d}`).value = "";
+            targetInput.value = ""; targetQtyInput.value = "";
+        }
+
+        const currentEff = parseFloat(effInput.value) || 0;
+        const currentTarget = parseFloat(targetInput.value) || 0;
+        
+        if (effInput.value !== "" && targetInput.value !== "") {
+            if (currentEff >= currentTarget) {
+                effInput.className = "text-success";
+            } else {
+                effInput.className = "text-danger";
+            }
+        } else {
+            effInput.className = ""; 
         }
     }
 }
 
-// ระบบนาฬิกา
+function manualCalculate(d) {
+    const sam = parseFloat(document.getElementById('globalSam').value) || 0;
+    const avgSec = parseFloat(document.getElementById(`resAvgSec_${d}`).value) || 0;
+    const pass = parseFloat(document.getElementById(`qPass_${d}`).value) || 0;
+    const fail = parseFloat(document.getElementById(`qFail_${d}`).value) || 0;
+
+    if (avgSec > 0) {
+        const avgMin = avgSec / 60;
+        document.getElementById(`resAvgMin_${d}`).value = avgMin.toFixed(2);
+        if (sam > 0) {
+            document.getElementById(`resEffPerc_${d}`).value = Math.ceil((sam / avgMin) * 100) + "%";
+            document.getElementById(`resEffPcs_${d}`).value = Math.ceil(60 / avgMin);
+        }
+    }
+
+    const totalQ = pass + fail;
+    document.getElementById(`resQRates_${d}`).value = (totalQ > 0) ? Math.ceil((pass / totalQ) * 100) + "%" : "";
+    
+    calculateAdaptiveGoals();
+}
+
 function toggleTimer() {
     const btn = document.getElementById('startStopBtn');
     if (!isRunning) {
@@ -285,27 +331,7 @@ function recordAndCalculate() {
     const avgSec = (elapsedTime / 1000) / cycles;
     document.getElementById(`resAvgSec_${day}`).value = avgSec.toFixed(2);
     manualCalculate(day);
-    calculateAdaptiveGoals();
-    updateAutoTargetDay(); // << อัปเดตวันที่อัตโนมัติหลังบันทึกนาฬิกา
-}
-
-function manualCalculate(d) {
-    const sam = parseFloat(document.getElementById('globalSam').value) || 0;
-    const avgSec = parseFloat(document.getElementById(`resAvgSec_${d}`).value) || 0;
-    const pass = parseFloat(document.getElementById(`qPass_${d}`).value) || 0;
-    const fail = parseFloat(document.getElementById(`qFail_${d}`).value) || 0;
-
-    if (avgSec > 0) {
-        const avgMin = avgSec / 60;
-        document.getElementById(`resAvgMin_${d}`).value = avgMin.toFixed(2);
-        if (sam > 0) {
-            const eff = Math.ceil((sam / avgMin) * 100);
-            document.getElementById(`resEffPerc_${d}`).value = eff + "%";
-            document.getElementById(`resEffPcs_${d}`).value = Math.ceil(60 / avgMin);
-        }
-    }
-    const totalQ = pass + fail;
-    if (totalQ > 0) document.getElementById(`resQRates_${d}`).value = Math.ceil((pass/totalQ)*100) + "%";
+    updateAutoTargetDay();
 }
 
 // ลายเซ็น
@@ -335,7 +361,7 @@ function saveSignature() {
 }
 
 calculateAdaptiveGoals();
-updateAutoTargetDay(); // รันเพื่อเซ็ตวันที่ 1 เป็นค่าเริ่มต้น
+updateAutoTargetDay();
 </script>
 
 </body>
