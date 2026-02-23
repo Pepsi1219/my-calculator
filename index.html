@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSA Operation Sign-Off Report (v1.5.0)</title>
+    <title>CSA Operation Sign-Off Report (v1.6.0)</title>
     <style>
-        /* CSS ส่วนใหญ่คงเดิมจาก v1.4.0 */
+        /* CSS ส่วนใหญ่คงเดิมเพื่อความต่อเนื่อง */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
         body { background: #f8f9fa; padding: 15px; }
         .report-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.1); max-width: 1550px; margin: auto; }
@@ -13,7 +13,7 @@
         .form-header { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px 16px; margin-bottom: 20px; background: #f0f4ff; padding: 15px; border-radius: 8px; }
         .field { display: flex; flex-direction: column; }
         .field label { font-size: .85rem; margin-bottom: 4px; font-weight: 600; color: #444; }
-        .field input { padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
+        .field input, .field select { padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; background: white; }
         .field input[readonly] { background: #e9ecef; }
         
         .stopwatch-bar { background: #fff; border: 2px solid #1a3c6d; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px; position: sticky; top: 10px; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
@@ -24,22 +24,16 @@
         th, td { border: 1px solid #ccc; padding: 6px; text-align: center; vertical-align: middle; }
         th { background: #e9ecef; }
         .day-cell { background: #f0f4ff; font-weight: bold; }
-        
-        /* เน้นช่องที่กดได้ */
         .clickable-input { cursor: pointer; background: #fffde7 !important; font-weight: bold; color: #1a3c6d; border: 1px solid #ffe082 !important; border-radius: 4px; }
-        .clickable-input:hover { background: #fff9c4 !important; }
 
         .report-table input { width: 100%; border: none; padding: 4px; text-align: center; background: transparent; }
         .report-table input[readonly] { color: #007bff; font-weight: bold; }
         
-        /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: white; margin: 15% auto; padding: 25px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
-        .modal-content h3 { margin-bottom: 15px; color: #1a3c6d; }
+        .modal-content { background: white; margin: 15% auto; padding: 25px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; }
         .modal-content input { width: 100%; padding: 12px; font-size: 1.5rem; text-align: center; border: 2px solid #007bff; border-radius: 8px; margin-bottom: 20px; }
         
         .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
-        .btn:active { transform: scale(0.95); }
         .btn-start { background: #28a745; } .btn-stop { background: #dc3545; } .btn-save { background: #007bff; } .btn-reset { background: #6c757d; }
         .sign-btn-group { display: flex; gap: 10px; justify-content: center; }
         
@@ -51,50 +45,47 @@
 <body>
 
 <div class="report-container">
-    <h1 class="report-title">CSA OPERATION SIGN-OFF REPORT (v1.5.0)</h1>
+    <h1 class="report-title">CSA OPERATION SIGN-OFF REPORT (v1.6.0)</h1>
 
     <div class="form-header">
-        <div class="field"><label>ขั้นตอนหลัก</label><input type="text" placeholder=""></div>
-        <div class="field"><label>พนักงาน</label><input type="text" placeholder=""></div>
-        <div class="field"><label>ครูฝึก</label><input type="text" placeholder=""></div>
-        <div class="field"><label>SAM (นาที)</label><input type="number" id="globalSam" step="0.001" oninput="calculateAdaptiveGoals()"></div>
-        <div class="field"><label style="color: #d63384;">เป้าหมาย Eff (%)</label><input type="number" id="globalEffTarget" value="" oninput="calculateAdaptiveGoals()"></div>
+        <div class="field"><label>ขั้นตอนหลัก</label><input type="text"></div>
+        <div class="field"><label>พนักงาน</label><input type="text"></div>
+        <div class="field"><label>ครูฝึก</label><input type="text"></div>
+        <div class="field"><label>SAM (นาที)</label><input type="number" id="globalSam" step="0.001" inputmode="decimal" oninput="calculateAdaptiveGoals()"></div>
+        <div class="field"><label style="color: #d63384;">เป้าหมาย Eff (%)</label><input type="number" id="globalEffTarget" inputmode="numeric" oninput="calculateAdaptiveGoals()"></div>
         <div class="field"><label>เป้าหมาย Q'ty (ชิ้น/ชม.)</label><input type="number" id="globalQtyTarget" readonly></div>
         <div class="field">
-    <label>ระดับงาน</label>
-    <select id="workLevel" style="padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; background: white;">
-        <option value="" disabled selected></option>
-        <option value="A">A</option>
-        <option value="B">B</option>
-        <option value="C">C</option>
-        <option value="D">D</option>
-    </select>
-</div>
-        <div class="field"><label style="color: #d63384;">จำนวนวันที่จะต้องฝึก</label><input type="number" id="trainingDays" value="" oninput="calculateAdaptiveGoals()"></div>
+            <label>ระดับงาน</label>
+            <select id="workLevel">
+                <option value="" disabled selected></option>
+                <option value="A">A</option><option value="B">B</option>
+                <option value="C">C</option><option value="D">D</option>
+            </select>
+        </div>
+        <div class="field"><label style="color: #d63384;">จำนวนวันที่จะต้องฝึก</label><input type="number" id="trainingDays" inputmode="numeric" oninput="calculateAdaptiveGoals()"></div>
         <div class="field">
-    <label>ชนิดผ้า</label>
-    <select id="fabricType" style="padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; background: white;">
-        <option value="" disabled selected></option>
-        <option value="Knitted">ผ้าถัก (Knitted Fabric)</option>
-        <option value="Woven">ผ้าทอ (Woven Fabric)</option>
-    </select>
-</div>
+            <label>ชนิดผ้า</label>
+            <select id="fabricType">
+                <option value="" disabled selected></option>
+                <option value="Knitted">ผ้าถัก (Knitted Fabric)</option>
+                <option value="Woven">ผ้าทอ (Woven Fabric)</option>
+            </select>
+        </div>
         <div class="field"><label>วันที่เริ่มฝึก</label><input type="date"></div>
         <div class="field"><label>วันที่โอนย้าย</label><input type="date"></div>
-        
     </div>
 
     <div class="stopwatch-bar">
         <div class="control-group">
             <label>วันที่:</label>
-            <input type="number" id="targetDay" value="1" min="1" max="30">
+            <input type="number" id="targetDay" value="1" min="1" max="30" inputmode="numeric" style="width: 60px; text-align: center; border: 1px solid #007bff; font-weight: bold;">
         </div>
         <div id="timerDisplay" class="timer-display">00:00:00</div>
         <button class="btn btn-start" id="startStopBtn" onclick="toggleTimer()">เริ่มจับเวลา</button>
         <button class="btn btn-reset" onclick="resetTimer()">รีเซ็ต</button>
         <div class="control-group" style="padding-left:15px; border-left:3px solid #007bff;">
             <label>รอบที่ทำได้:</label>
-            <input type="number" id="cyclesDone" value="1" min="1">
+            <input type="number" id="cyclesDone" value="1" min="1" inputmode="numeric" style="width: 60px; text-align: center;">
         </div>
         <button class="btn btn-save" onclick="recordAndCalculate()">💾 บันทึกลงตาราง</button>
     </div>
@@ -127,7 +118,7 @@
     <div class="modal-content">
         <h3>ระบุเวลาเฉลี่ย (วินาที)</h3>
         <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">วันที่ <span id="modalDayLabel"></span></p>
-        <input type="number" id="manualSecondsInput" step="0.01" placeholder="เช่น 70.5">
+        <input type="number" id="manualSecondsInput" step="0.01" inputmode="decimal" placeholder="เช่น 70.5">
         <div class="sign-btn-group">
             <button class="btn btn-save" onclick="saveManualSeconds()">บันทึก</button>
             <button class="btn btn-stop" onclick="closeManualModal()">ยกเลิก</button>
@@ -149,7 +140,7 @@
 
 <script>
 let startTime, timerInterval, elapsedTime = 0, isRunning = false;
-let currentActiveDay = null; // เก็บวันที่กำลังแก้ไข (ทั้งเซ็นชื่อและกรอกวินาที)
+let currentActiveDay = null;
 
 // 1. สร้างตาราง 30 วัน
 const tbody = document.getElementById("tableBody");
@@ -159,12 +150,12 @@ for(let d=1; d<=30; d++) {
         <td class="day-cell">${d}</td>
         <td><input type="text" id="targetEff_${d}" readonly></td>
         <td><input type="text" id="targetQty_${d}" readonly></td>
-        <td><input type="text" id="resAvgSec_${d}" readonly class="clickable-input" onclick="openManualModal(${d})" placeholder="แตะเพื่อใส่"></td>
+        <td><input type="text" id="resAvgSec_${d}" readonly class="clickable-input" onclick="openManualModal(${d})" placeholder="แตะ"></td>
         <td><input type="text" id="resAvgMin_${d}" readonly></td>
         <td><input type="text" id="resEffPerc_${d}" readonly style="background:#fff3cd;"></td>
         <td><input type="text" id="resEffPcs_${d}" readonly></td>
-        <td><input type="number" id="qPass_${d}" oninput="manualCalculate(${d})"></td>
-        <td><input type="number" id="qFail_${d}" oninput="manualCalculate(${d})"></td>
+        <td><input type="number" id="qPass_${d}" inputmode="numeric" oninput="manualCalculate(${d})"></td>
+        <td><input type="number" id="qFail_${d}" inputmode="numeric" oninput="manualCalculate(${d})"></td>
         <td><input type="text" id="resQRates_${d}" readonly></td>
         <td><input type="checkbox"></td><td><input type="checkbox"></td>
         <td><input type="checkbox"></td><td><input type="checkbox"></td>
@@ -177,7 +168,20 @@ for(let d=1; d<=30; d++) {
     tbody.appendChild(row);
 }
 
-// --- ฟังก์ชันใหม่: Manual Seconds Modal ---
+// ฟังก์ชันใหม่: หาค่าวันล่าสุดที่มีข้อมูลและอัปเดตช่อง "วันที่"
+function updateAutoTargetDay() {
+    let lastDayWithData = 0;
+    for (let d = 1; d <= 30; d++) {
+        if (document.getElementById(`resEffPerc_${d}`).value !== "") {
+            lastDayWithData = d;
+        }
+    }
+    // ตั้งค่าเป้าหมายวันถัดไป (แต่ไม่เกิน 30)
+    let nextDay = lastDayWithData + 1;
+    if (nextDay > 30) nextDay = 30;
+    document.getElementById('targetDay').value = nextDay;
+}
+
 function openManualModal(day) {
     currentActiveDay = day;
     document.getElementById('modalDayLabel').innerText = day;
@@ -195,15 +199,15 @@ function saveManualSeconds() {
     const sec = parseFloat(document.getElementById('manualSecondsInput').value);
     if (!isNaN(sec) && sec >= 0) {
         document.getElementById(`resAvgSec_${currentActiveDay}`).value = sec.toFixed(2);
-        manualCalculate(currentActiveDay); // คำนวณแถว
-        calculateAdaptiveGoals(); // คำนวณเป้าหมายใหม่ (Adaptive)
+        manualCalculate(currentActiveDay);
+        calculateAdaptiveGoals();
+        updateAutoTargetDay(); // << อัปเดตวันที่อัตโนมัติ
         closeManualModal();
     } else {
         alert("กรุณาระบุตัวเลขที่ถูกต้อง");
     }
 }
 
-// 2. ระบบคำนวณเป้าหมาย (Adaptive Logic) คงเดิม
 function calculateAdaptiveGoals() {
     const globalEff = parseFloat(document.getElementById('globalEffTarget').value) || 0;
     const trainDays = parseInt(document.getElementById('trainingDays').value) || 1;
@@ -215,7 +219,10 @@ function calculateAdaptiveGoals() {
     let lastActualEff = 0, lastActualDay = 0;
     for (let d = 1; d <= 30; d++) {
         let actualEffStr = document.getElementById(`resEffPerc_${d}`).value;
-        if (actualEffStr) { lastActualEff = parseFloat(actualEffStr); lastActualDay = d; }
+        if (actualEffStr) { 
+            lastActualEff = parseFloat(actualEffStr); 
+            lastActualDay = d; 
+        }
     }
 
     for (let d = 1; d <= 30; d++) {
@@ -240,7 +247,7 @@ function calculateAdaptiveGoals() {
     }
 }
 
-// 3. ระบบนาฬิกา & บันทึก (แบบดั้งเดิม)
+// ระบบนาฬิกา
 function toggleTimer() {
     const btn = document.getElementById('startStopBtn');
     if (!isRunning) {
@@ -269,7 +276,6 @@ function resetTimer() {
     elapsedTime = 0; isRunning = false;
     document.getElementById('timerDisplay').innerText = "00:00:00";
     document.getElementById('startStopBtn').innerText = "เริ่มจับเวลา";
-    document.getElementById('startStopBtn').className = "btn btn-start";
 }
 
 function recordAndCalculate() {
@@ -280,6 +286,7 @@ function recordAndCalculate() {
     document.getElementById(`resAvgSec_${day}`).value = avgSec.toFixed(2);
     manualCalculate(day);
     calculateAdaptiveGoals();
+    updateAutoTargetDay(); // << อัปเดตวันที่อัตโนมัติหลังบันทึกนาฬิกา
 }
 
 function manualCalculate(d) {
@@ -301,7 +308,7 @@ function manualCalculate(d) {
     if (totalQ > 0) document.getElementById(`resQRates_${d}`).value = Math.ceil((pass/totalQ)*100) + "%";
 }
 
-// 4. ลายเซ็น
+// ลายเซ็น
 const canvas = document.getElementById('signature-pad');
 const ctx = canvas.getContext('2d');
 let writing = false;
@@ -328,6 +335,7 @@ function saveSignature() {
 }
 
 calculateAdaptiveGoals();
+updateAutoTargetDay(); // รันเพื่อเซ็ตวันที่ 1 เป็นค่าเริ่มต้น
 </script>
 
 </body>
