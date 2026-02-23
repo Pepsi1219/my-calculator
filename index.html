@@ -3,20 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSA Operation Sign-Off Report (v1.9.0)</title>
+    <title>CSA Operation Sign-Off Report (v1.0.10)</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
-        body { background: #f8f9fa; padding: 15px; }
-        .report-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.1); max-width: 1550px; margin: auto; }
-        .report-title { text-align: center; margin-bottom: 20px; color: #1a3c6d; border-bottom: 2px solid #1a3c6d; padding-bottom: 10px; }
-        .form-header { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px 16px; margin-bottom: 20px; background: #f0f4ff; padding: 15px; border-radius: 8px; }
-        .field { display: flex; flex-direction: column; }
-        .field label { font-size: .85rem; margin-bottom: 4px; font-weight: 600; color: #444; }
-        .field input, .field select { padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; background: white; }
-        .field input[readonly] { background: #e9ecef; }
+        * { 
+          box-sizing: border-box; 
+          margin: 0; padding: 0; 
+          font-family: 'Sarabun', sans-serif; 
+      }
+      
+        body { 
+          background: #f8f9fa; 
+          padding: 15px; 
+      }
+        .report-container { 
+          background: white; 
+          padding: 20px; 
+          border-radius: 8px; 
+          box-shadow: 0 2px 10px rgba(0,0,0,.1); 
+          max-width: 1550px; 
+          margin: auto; 
+      }
+        .report-title { 
+          text-align: center; 
+          margin-bottom: 20px; 
+          color: #1a3c6d; 
+          border-bottom: 2px solid #1a3c6d; 
+          padding-bottom: 10px; 
+      }
+        .form-header { 
+          display: grid; 
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+          gap: 12px 16px; 
+          margin-bottom: 20px; 
+          background: #f0f4ff; 
+          padding: 15px; 
+          border-radius: 8px; 
+      }
+        .field { 
+          display: flex; 
+          flex-direction: column; 
+      }
+        .field label { 
+          font-size: .85rem; 
+          margin-bottom: 4px; 
+          font-weight: 600; 
+          color: #444; }
+      
+        .field input, .field select { 
+          padding: 8px 10px; 
+          border: 1px solid #ccc; 
+          border-radius: 5px; 
+          font-size: 1rem; 
+          background: white; 
+      }
+        .field input[readonly] { 
+          background: #e9ecef; 
+      }
         
-        .stopwatch-bar { background: #fff; border: 0px solid #1a3c6d; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px; position: sticky; top: 10px; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .timer-display { font-size: 1.8rem; font-weight: bold; font-family: monospace; background: #222; color: #00ff00; padding: 5px 15px; border-radius: 8px; min-width: 140px; text-align: center; }
+        .stopwatch-bar { 
+          background: #fff; 
+          border: 0px solid #1a3c6d; 
+          padding: 12px; 
+          border-radius: 12px; 
+          margin-bottom: 20px; 
+          display: flex; 
+          flex-wrap: wrap; 
+          align-items: center; 
+          justify-content: center; 
+          gap: 15px; 
+          position: sticky;
+          top: 10px; 
+          z-index: 100; 
+          box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+      }
+        .timer-display { 
+          font-size: 1.8rem; 
+          font-weight: bold; 
+          font-family: monospace; 
+          background: #222; 
+          color: #00ff00; 
+          padding: 5px 15px; 
+          border-radius: 8px; 
+          min-width: 140px; 
+          text-align: center; 
+      }
         
         .table-wrapper { overflow-x: auto; }
         .report-table {
@@ -29,26 +99,131 @@
         .cause-col {
           width: 40px;
       }
-        th, td { border: .5px solid #ccc; padding: 6px; text-align: center; vertical-align: middle; }
-        th { background: #e9ecef; }
-        .day-cell { background: #f0f4ff; font-weight: bold; }
-        .clickable-input { cursor: pointer; background: #fffde7 !important; font-weight: bold; color: #1a3c6d; border: 1px solid #ffe082 !important; border-radius: 4px; }
-        .report-table input { width: 100%; border: none; padding: 4px; text-align: center; background: transparent; }
+        th, td { 
+          border: .5px solid #ccc; 
+          padding: 6px; 
+          text-align: center; 
+          vertical-align: middle; 
+      }
+      
+        th {
+          background: #e9ecef; 
+      }
+      
+        .day-cell { 
+          background: #f0f4ff; 
+          font-weight: bold;
+      }
+      
+        .clickable-input { 
+          cursor: pointer; 
+          background: #fffde7 !important; 
+          font-weight: bold; 
+          color: #1a3c6d; 
+          border: 1px solid #ffe082 !important; 
+          border-radius: 4px;
+      }
+      
+        .report-table input { 
+          width: 100%; 
+          border: none; 
+          padding: 4px; 
+          text-align: center; 
+          background: transparent; 
+      }
         
-        .text-success { color: #28a745 !important; font-weight: bold; }
-        .text-danger { color: #dc3545 !important; font-weight: bold; }
+        .text-success { 
+          color: #28a745 !important; 
+          font-weight: bold; 
+      }
+      
+        .text-danger { 
+          color: #dc3545 !important; 
+          font-weight: bold; 
+      }
 
-        .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: white; margin: 15% auto; padding: 25px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; }
-        .modal-content input { width: 100%; padding: 12px; font-size: 1.5rem; text-align: center; border: 2px solid #007bff; border-radius: 8px; margin-bottom: 20px; }
+        .modal { 
+          display: none; 
+          position: fixed; 
+          z-index: 1001; 
+          left: 0; 
+          top: 0; 
+          width: 100%; 
+          height: 100%; 
+          background: rgba(0,0,0,0.8);
+      }
+      
+        .modal-content { 
+          background: white; 
+          margin: 15% auto; 
+          padding: 25px; 
+          border-radius: 10px; 
+          width: 90%; 
+          max-width: 400px; 
+          text-align: center; 
+      }
+      
+        .modal-content input { 
+          width: 100%; 
+          padding: 12px; 
+          font-size: 1.5rem; 
+          text-align: center; 
+          border: 2px solid #007bff; 
+          border-radius: 8px; 
+          margin-bottom: 20px; 
+      }
         
-        .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
-        .btn-start { background: #28a745; } .btn-stop { background: #dc3545; } .btn-save { background: #007bff; } .btn-reset { background: #6c757d; }
-        .sign-btn-group { display: flex; gap: 10px; justify-content: center; }
+        .btn { 
+          padding: 10px 16px; 
+          border: none; 
+          border-radius: 6px; 
+          cursor: pointer; 
+          font-weight: bold; 
+          color: white; 
+          display: flex; 
+          align-items: center; 
+          gap: 5px; 
+          transition: 0.2s; 
+      }
+      
+        .btn-start { 
+          background: #28a745; 
+      }
+        .btn-stop { 
+          background: #dc3545;
+      } 
+        .btn-save { 
+        background: #007bff; 
+      } 
+       .btn-reset { 
+         background: #6c757d;
+      }
+        .sign-btn-group { 
+          display: flex;
+          gap: 10px; 
+          justify-content: center; 
+      }
         
-        .sign-cell { cursor: pointer; min-width: 120px; height: 50px; background: #fff; display: flex; align-items: center; justify-content: center; }
-        .sign-cell img { max-height: 45px; display: none; }
-        #signature-pad { border: 2px dashed #ccc; background: #fff; margin-bottom: 15px; touch-action: none; }
+        .sign-cell { 
+          cursor: pointer; 
+          min-width: 120px; 
+          height: 50px; 
+          background: #fff; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center;
+      }
+      
+        .sign-cell img { 
+          max-height: 45px; 
+          display: none;
+      }
+      
+        #signature-pad { 
+          border: 2px dashed #ccc; 
+          background: #fff; margin-bottom: 15px; 
+          touch-action: none;
+      }
     </style>
 </head>
 <body>
@@ -210,8 +385,6 @@ for(let d=1; d<=30; d++) {
     tbody.appendChild(row);
 }
 
- 
-  
 function updateAutoTargetDay() {
     let lastDayWithData = 0;
     for (let d = 1; d <= 30; d++) {
@@ -283,7 +456,7 @@ function calculateAdaptiveGoals() {
         let targetValue = 0;
         let showTarget = false;
 
-        // เงื่อนไข v1.9.0: แสดงผลเมื่อ (เข้าเงื่อนไข Q100) AND (ไม่เกินจำนวนวันฝึกที่กำหนด)
+        // เงื่อนไข v1.9.0: แสดงผลเมื่อ (เข้าเงื่อนไข Quality = 100%) AND (ไม่เกินจำนวนวันฝึกที่กำหนด)
         if (firstDayQ100 > 0 && d > firstDayQ100 && d <= trainDays) {
             showTarget = true;
             if (d <= lastActualDay) {
@@ -368,7 +541,7 @@ function resetTimer() {
     clearInterval(timerInterval);
     elapsedTime = 0; isRunning = false;
     document.getElementById('timerDisplay').innerText = "00:00:00";
-    document.getElementById('startStopBtn').innerText = "เริ่มจับเวลา";
+    document.getElementById('startStopBtn').innerText = "Start"
 }
 
 function recordAndCalculate() {
@@ -377,8 +550,6 @@ function recordAndCalculate() {
     
     // ตรวจสอบว่ามีการจับเวลาหรือยัง
     if (elapsedTime === 0) return alert("กรุณาจับเวลาก่อน");
-
-    // ตรวจสอบช่อง cyclesDone (ถ้าไม่มีให้ default เป็น 1 เพื่อไม่ให้เกิด Error)
     const cyclesElem = document.getElementById('cyclesDone');
     const cycles = cyclesElem ? (parseFloat(cyclesElem.value) || 1) : 1;
     
