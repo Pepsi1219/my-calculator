@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSA Operation Sign-Off Report (v1.0.10)</title>
+  
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
     <style>
         * { 
           box-sizing: border-box; 
@@ -269,6 +273,24 @@
                  transition: background 0.3s;">
     🗑️ Clear All
   </button>
+        
+  <button class="btn" 
+          onclick="showPerformanceChart()" 
+          style="background: #17a2b8; 
+                 color: white;
+                 border: none;
+                 padding: 10px 20px;
+                 border-radius: 5px;
+                 cursor: pointer;
+                 font-size: 14px;
+                 display: flex;
+                 align-items: center;
+                 gap: 5px;
+                 transition: background 0.3s;">
+    📈 ดูสรุปกราฟประสิทธิภาพ
+</button>
+        
+
 </div>
     <div class="form-header">
         <div class="field"><label>ขั้นตอนหลัก</label>
@@ -359,12 +381,14 @@
                 onclick="resetTimer()">Reset
       </button>
       
-        <div class="control-group" style="padding-left:15px; border-left:3px solid #007bff;">
+        <div class="control-group" 
+             style="padding-left:15px; border-left:3px solid #007bff;">
         </div>
-        <button class="btn btn-save" onclick="recordAndCalculate()">💾 Save</button>
-    </div>
-  
-  
+        <button class="btn btn-save" 
+                onclick="recordAndCalculate()">💾 Save</button>
+      
+ </div>
+  <div style="display: flex; gap: 10px;">
      <div class="control-group">
          <label>วัน/ชั่วโมงที่:</label>
          <input type="number"
@@ -373,10 +397,26 @@
                 min="1"
                 max="30"
                 inputmode="numeric"
-                style="width: 60px; text-align: center;
-                       border: 0px solid #007bff; font-weight: bold;">
+                style="width: 60px; 
+                       text-align: center;
+                       border: 0px solid #007bff; 
+                       font-weight: bold;">
         </div>
 
+        <button id="btnPlanA" 
+                class="btn" 
+                onclick="adjustPlan('A')" 
+                style="background: #dc3545; color: white;"
+                disabled>แผน A
+        </button>
+
+        <button id="btnPlanB" 
+                class="btn" 
+                onclick="adjustPlan('B')" 
+                style="background: #28a745; color: white;"disabled>แผน B
+        </button>
+    </div>
+</div>
     <div class="table-wrapper">
         <table class="report-table">
             <table class="report-table">
@@ -421,8 +461,13 @@
         </table>
     </div>
 </div>
-</div> </div> <div class="evaluation-section" style="margin-top: 30px; font-family: sans-serif;">
+    </div> 
+      </div> 
+        <div class="evaluation-section" 
+             style="margin-top: 30px; font-family: sans-serif;">
+          
     <h3 style="border-bottom: 2px solid #333; padding-bottom: 5px;">สรุปการประเมิน</h3>
+          
     <table style="width: 100%; border-collapse: collapse; margin-top: 10px; border: 1px solid #ccc;">
         <thead>
             <tr style="background-color: #f8f9fa;">
@@ -433,23 +478,44 @@
         <tbody>
             <tr>
                 <td style="border: 1px solid #ccc; padding: 10px;">ผ่านแบบมีเงื่อนไข หากผ่านการทดสอบอย่างน้อยหนึ่งในสองข้อ</td>
-                <td style="border: 1px solid #ccc; text-align: center;"><input type="checkbox" id="eval_cond" style="transform: scale(1.5);"></td>
+                <td style="border: 1px solid #ccc; text-align: center;">
+                  <input type="checkbox" id="eval_cond" style="transform: scale(1.5);"></td>
             </tr>
             <tr>
                 <td style="border: 1px solid #ccc; padding: 10px;">ผ่านการทดสอบทั้งด้านประสิทธิภาพ (EFF) และคุณภาพ (RFT)</td>
-                <td style="border: 1px solid #ccc; text-align: center;"><input type="checkbox" id="eval_both" style="transform: scale(1.5);"></td>
+                <td style="border: 1px solid #ccc; text-align: center;">
+                  <input type="checkbox" 
+                         id="eval_both" 
+                         style="transform: scale(1.5);"></td>
             </tr>
             <tr>
                 <td style="border: 1px solid #ccc; padding: 10px;">ได้คะแนนอย่างน้อย 60% ในการฝึกการปฏิบัติงาน</td>
-                <td style="border: 1px solid #ccc; text-align: center;"><input type="checkbox" id="eval_60" style="transform: scale(1.5);"></td>
+                <td style="border: 1px solid #ccc; text-align: center;">
+                  <input type="checkbox" 
+                         id="eval_60" 
+                         style="transform: scale(1.5);"></td>
             </tr>
             <tr>
                 <td style="border: 1px solid #ccc; padding: 10px;">ได้คะแนนอย่างน้อย 90% ในการฝึกการปฏิบัติงาน</td>
-                <td style="border: 1px solid #ccc; text-align: center;"><input type="checkbox" id="eval_90" style="transform: scale(1.5);"></td>
+                <td style="border: 1px solid #ccc; text-align: center;">
+                  <input type="checkbox" 
+                         id="eval_90" 
+                         style="transform: scale(1.5);"></td>
             </tr>
         </tbody>
     </table>
 </div>
+  
+<div id="chartModal" style="display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.8);">
+    <div style="background:white; margin:5% auto; padding:20px; width:80%; border-radius:10px;">
+        <span onclick="document.getElementById('chartModal').style.display='none'" style="float:right; cursor:pointer; font-size:24px;">&times;</span>
+        <h2 style="text-align:center;">กราฟเปรียบเทียบเป้าหมาย vs ประสิทธิภาพจริง</h2>
+        <canvas id="performanceChart" width="400" height="200"></canvas>
+    </div>
+</div>
+
+
+  
 <div id="manualInputModal" class="modal">
     <div class="modal-content">
         <h3>ระบุเวลาเฉลี่ย (วินาที)</h3>
@@ -480,6 +546,221 @@
 </div>
 
 <script>
+  
+// เก็บสถานะการกดรายวัน (ในระบบจริงอาจจะใช้ Date().toDateString())
+let lastAdjustedDay = 0; 
+
+function adjustPlan(type) {
+    const trainDaysInput = document.getElementById('trainingDays');
+    let trainDays = parseInt(trainDaysInput.value) || 0;
+
+    // 1. หาข้อมูลวันล่าสุดที่มีการบันทึกผลจริง
+    let lastDay = 0;
+    let lastEff = 0;
+    let lastTarget = 0;
+
+    for (let d = 1; d <= 30; d++) {
+        const effVal = document.getElementById(`resEffPerc_${d}`).value;
+        const targetVal = document.getElementById(`targetEff_${d}`).value;
+        if (effVal !== "" && targetVal !== "") {
+            lastDay = d;
+            lastEff = parseFloat(effVal);
+            lastTarget = parseFloat(targetVal);
+        }
+    }
+
+    // 2. ตรวจสอบเงื่อนไขเบื้องต้น
+    if (lastDay === 0) {
+        alert("กรุณาบันทึกผลประสิทธิภาพจริงก่อนปรับแผน");
+        return;
+    }
+
+    if (lastAdjustedDay === lastDay) {
+        alert(`คุณได้ปรับแผนสำหรับผลงานวันที่ ${lastDay} ไปแล้ว (กดได้วันละ 1 ครั้ง)`);
+        return;
+    }
+
+    // 3. ระบบยืนยันการปรับแผน (Confirmation)
+    if (type === 'A') {
+        if (lastEff < lastTarget) {
+            // ถามเพื่อความแน่ใจสำหรับแผน A
+            const confirmA = confirm(`ประสิทธิภาพจริง (${lastEff}%) ต่ำกว่าเป้าหมาย (${lastTarget}%)\nคุณต้องการขยายระยะเวลาการฝึกเพิ่มอีก 1 วัน ใช่หรือไม่?`);
+            
+            if (confirmA) {
+                trainDays += 1;
+                trainDaysInput.value = trainDays;
+                lastAdjustedDay = lastDay;
+                alert(`ปรับแผน A สำเร็จ: ขยายเวลาฝึกเป็น ${trainDays} วัน`);
+            } else {
+                return; // ยกเลิกการทำงาน
+            }
+        } else {
+            alert("เงื่อนไขไม่ตรง: แผน A ใช้เมื่อประสิทธิภาพจริง 'ต่ำกว่า' เป้าหมายเท่านั้น");
+            return;
+        }
+    } 
+    else if (type === 'B') {
+        if (lastEff > lastTarget) {
+            if (trainDays > lastDay) {
+                // ถามเพื่อความแน่ใจสำหรับแผน B
+                const confirmB = confirm(`ประสิทธิภาพจริง (${lastEff}%) สูงกว่าเป้าหมาย (${lastTarget}%)\nคุณต้องการลดระยะเวลาการฝึกลง 1 วัน ใช่หรือไม่?`);
+                
+                if (confirmB) {
+                    trainDays -= 1;
+                    trainDaysInput.value = trainDays;
+                    lastAdjustedDay = lastDay;
+                    alert(`ปรับแผน B สำเร็จ: ลดเวลาฝึกเหลือ ${trainDays} วัน`);
+                } else {
+                    return; // ยกเลิกการทำงาน
+                }
+            } else {
+                alert("ไม่สามารถลดวันฝึกให้ต่ำกว่าวันปัจจุบันได้");
+                return;
+            }
+        } else {
+            alert("เงื่อนไขไม่ตรง: แผน B ใช้เมื่อประสิทธิภาพจริง 'สูงกว่า' เป้าหมายเท่านั้น");
+            return;
+        }
+    }
+
+    // 4. รันการคำนวณเป้าหมายใหม่ และอัปเดตกราฟ
+    calculateAdaptiveGoals();
+    
+    if (typeof showPerformanceChart === "function" && document.getElementById('chartModal').style.display === 'block') {
+        showPerformanceChart();
+    }
+}
+  
+function updatePlanButtons() {
+    const btnA = document.getElementById('btnPlanA');
+    const btnB = document.getElementById('btnPlanB');
+    
+    let lastDay = 0;
+    let lastEff = 0;
+    let lastTarget = 0;
+
+    // หาข้อมูลวันล่าสุดที่มีทั้ง ผลจริง และ เป้าหมาย
+    for (let d = 1; d <= 30; d++) {
+        const effVal = document.getElementById(`resEffPerc_${d}`).value;
+        const targetVal = document.getElementById(`targetEff_${d}`).value;
+        
+        if (effVal !== "" && targetVal !== "") {
+            lastDay = d;
+            lastEff = parseFloat(effVal);
+            lastTarget = parseFloat(targetVal);
+        }
+    }
+
+    // เงื่อนไขการ Disable
+    // 1. ถ้ายังไม่มีข้อมูลวันล่าสุด หรือ วันนี้กดไปแล้ว -> ปิดทั้งคู่
+    if (lastDay === 0 || lastAdjustedDay === lastDay) {
+        btnA.disabled = true;
+        btnB.disabled = true;
+        btnA.style.opacity = "0.5";
+        btnB.style.opacity = "0.5";
+    } else {
+        // 2. แผน A เปิดเมื่อ ผลจริง < เป้าหมาย
+        btnA.disabled = !(lastEff < lastTarget);
+        btnA.style.opacity = (lastEff < lastTarget) ? "1" : "0.5";
+
+        // 3. แผน B เปิดเมื่อ ผลจริง > เป้าหมาย
+        btnB.disabled = !(lastEff > lastTarget);
+        btnB.style.opacity = (lastEff > lastTarget) ? "1" : "0.5";
+    }
+}
+  
+// ตัวอย่างการใส่ไว้ใน Event Listener ของการกรอกข้อมูล
+function checkButtonStatus(day, eff, target) {
+    const btnA = document.getElementById('btnPlanA');
+    const btnB = document.getElementById('btnPlanB');
+    
+    if (eff !== "" && target !== "") {
+        const valEff = parseFloat(eff);
+        const valTarget = parseFloat(target);
+        
+        btnA.disabled = !(valEff < valTarget);
+        btnB.disabled = !(valEff > valTarget);
+    }
+}
+  
+  
+  
+  
+  
+  
+  // กราฟเส้น
+let myChart = null;
+
+function showPerformanceChart() {
+    // 1. เปิด Modal
+    document.getElementById('chartModal').style.display = 'block';
+
+    // 2. เตรียมข้อมูลจากตาราง
+    const labels = []; // วันที่ 1-30
+    const targetData = []; // เก็บค่าเป้าหมาย
+    const actualData = []; // เก็บค่าจริง
+
+    for (let d = 1; d <= 30; d++) {
+        labels.push("วันที่ " + d);
+        
+        // ดึงค่าเป้าหมาย (ตัดเครื่องหมาย % ออกถ้ามี)
+        const tVal = document.getElementById(`targetEff_${d}`).value;
+        targetData.push(tVal ? parseFloat(tVal) : null);
+
+        // ดึงค่าจริง
+        const aVal = document.getElementById(`resEffPerc_${d}`).value;
+        actualData.push(aVal ? parseFloat(aVal) : null);
+    }
+
+    // 3. สร้างกราฟ
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    
+    // ถ้ามีกราฟเก่าอยู่แล้วให้ลบทิ้งก่อน (ป้องกันกราฟซ้อนกัน)
+    if (myChart) { myChart.destroy(); }
+
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'เป้าหมายประสิทธิภาพ (%)',
+                    data: targetData,
+                    borderColor: '#007bff',
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    tension: 0.1, // ความโค้งของเส้น
+                    spanGaps: true // ให้ข้ามจุดที่ไม่มีข้อมูลไปเชื่อมจุดถัดไป
+                },
+                {
+                    label: 'ประสิทธิภาพจริง (%)',
+                    data: actualData,
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.1,
+                    spanGaps: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100, // กำหนดค่าสูงสุดที่ 100%
+                    title: { display: true, text: 'Percentage (%)' }
+                }
+            },
+            plugins: {
+                legend: { position: 'top' }
+            }
+        }
+    });
+}
+  
+  
 
 function exportToExcel() {
     const wb = XLSX.utils.book_new();
@@ -615,10 +896,10 @@ function clearAllData() {
         calculateAdaptiveGoals();
         
         alert("ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว");
+      lastAdjustedDay = 0; // รีเซ็ตตัวแปรเช็ควัน
+        updatePlanButtons(); // อัปเดตสถานะปุ่ม
     }
 } 
-  
-  
   
   
   
@@ -765,6 +1046,7 @@ function calculateAdaptiveGoals() {
             }
         } else {
             effInput.className = ""; 
+          updatePlanButtons(); 
         }
     }
 }
