@@ -421,7 +421,35 @@
         </table>
     </div>
 </div>
-
+</div> </div> <div class="evaluation-section" style="margin-top: 30px; font-family: sans-serif;">
+    <h3 style="border-bottom: 2px solid #333; padding-bottom: 5px;">สรุปการประเมิน</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; border: 1px solid #ccc;">
+        <thead>
+            <tr style="background-color: #f8f9fa;">
+                <th style="border: 1px solid #ccc; padding: 12px; text-align: left;">รายละเอียดคำแนะนำ</th>
+                <th style="border: 1px solid #ccc; padding: 12px; text-align: center; width: 150px;">การตัดสินใจ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="border: 1px solid #ccc; padding: 10px;">ผ่านแบบมีเงื่อนไข หากผ่านการทดสอบอย่างน้อยหนึ่งในสองข้อ</td>
+                <td style="border: 1px solid #ccc; text-align: center;"><input type="checkbox" id="eval_cond" style="transform: scale(1.5);"></td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ccc; padding: 10px;">ผ่านการทดสอบทั้งด้านประสิทธิภาพ (EFF) และคุณภาพ (RFT)</td>
+                <td style="border: 1px solid #ccc; text-align: center;"><input type="checkbox" id="eval_both" style="transform: scale(1.5);"></td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ccc; padding: 10px;">ได้คะแนนอย่างน้อย 60% ในการฝึกการปฏิบัติงาน</td>
+                <td style="border: 1px solid #ccc; text-align: center;"><input type="checkbox" id="eval_60" style="transform: scale(1.5);"></td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ccc; padding: 10px;">ได้คะแนนอย่างน้อย 90% ในการฝึกการปฏิบัติงาน</td>
+                <td style="border: 1px solid #ccc; text-align: center;"><input type="checkbox" id="eval_90" style="transform: scale(1.5);"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 <div id="manualInputModal" class="modal">
     <div class="modal-content">
         <h3>ระบุเวลาเฉลี่ย (วินาที)</h3>
