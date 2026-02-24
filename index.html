@@ -75,7 +75,7 @@
           width: 40px;
       }
         th, td { 
-          border: .5px solid #ccc; 
+          border: 1px solid #ccc; 
           padding: 6px; 
           text-align: center; 
           vertical-align: middle; 
@@ -101,7 +101,7 @@
       
         .report-table input { 
           width: 100%; 
-          border: none; 
+          border: 0px; 
           padding: 4px; 
           text-align: center; 
           background: transparent; 
@@ -208,8 +208,8 @@
         
         .sign-cell { 
           cursor: pointer; 
-          min-width: 120px; 
-          height: 50px; 
+          min-width: 20px; 
+          height: 38px; 
           background: #fff; 
           display: flex; 
           align-items: center; 
@@ -217,7 +217,7 @@
       }
       
         .sign-cell img { 
-          max-height: 45px; 
+          max-height: 20px; 
           display: none;
       }
       
@@ -253,8 +253,8 @@
           <input type="number" 
                  id="globalSam" 
                  step="0.001" 
-                 inputmode="decimal" 
-                 oninput="calculateAdaptiveGoals()">
+                 inputmode="decimal"
+              oninput="calculateAdaptiveGoals()">
       </div>
       
         <div class="field"><label>เป้าหมาย Eff (%)</label>
@@ -345,7 +345,7 @@
         <table class="report-table">
             <table class="report-table">
               <colgroup>
-                <col style="width:60px">
+                <col style="width:30px">
                 <col span="6">
                 <col span="3">
                 <col class="cause-col">
@@ -353,7 +353,7 @@
                 <col class="cause-col">
                 <col class="cause-col">
                 <col style="width:180px">
-                <col style="width:140px">
+                <col style="width:100px">
          </colgroup>
               
             <thead>
@@ -367,8 +367,8 @@
                 </tr>
                 <tr>
                     <th>เป้าหมายประสิทธิภาพ (%)</th>
-                    <th> เป้าหมายประสิทธิภาพ (ชิ้น)</th>
-                    <th> เวลาเฉลี่ยจริง (วินาที)</th>
+                    <th>เป้าหมายประสิทธิภาพ (ชิ้น)</th>
+                    <th>เวลาเฉลี่ยจริง (วินาที)</th>
                     <th>เวลาต่อรอบจริง (นาที)</th>
                     <th>ประสิทธิภาพจริง (%)</th>
                     <th>ประสิทธิภาพจริง (ชิ้น)</th>
@@ -403,7 +403,7 @@
 <div id="signModal" class="modal">
     <div class="modal-content">
         <h3>ลงลายเซ็น</h3>
-        <canvas id="signature-pad" width="450" height="200"></canvas>
+        <canvas id="signature-pad" width="350" height="200"></canvas>
         <div class="sign-btn-group">
             <button class="btn btn-reset" 
                     onclick="clearPad()">ล้าง</button>
@@ -418,7 +418,7 @@
 <script>
 function clearAllData() {
     if (confirm("คุณต้องการลบข้อมูลทั้งหมดในฟอร์มนี้ใช่หรือไม่? ข้อมูลที่ลบแล้วไม่สามารถเรียกคืนได้")) {
-        // 1. เคลียร์ข้อมูลใน Form Header (input ทั่วไป)
+        // 1. เคลียร์ข้อมูลใน Form Header
         const headerInputs = document.querySelectorAll('.form-header input, .form-header select');
         headerInputs.forEach(input => {
             if (input.type === 'date' || input.type === 'number' || input.type === 'text') {
@@ -438,11 +438,10 @@ function clearAllData() {
             input.value = "";
         }
 
-        // แก้ไขตรงนี้: ล้าง Class สีแจ้งเตือน แต่คง Class ไฮไลท์ของช่องวินาทีไว้
         if (input.id === `resAvgSec_${d}`) {
-            input.className = "clickable-input"; // คืนค่าไฮไลท์สีเหลือง
+            input.className = "clickable-input";
         } else {
-            input.className = ""; // ล้าง class ของช่องอื่นๆ
+            input.className = "";
         }
     });
 
@@ -672,7 +671,7 @@ function recordAndCalculate() {
     // คำนวณวินาทีเฉลี่ย
     const avgSec = (elapsedTime / 1000) / cycles;
     
-    // บันทึกลงในช่อง "เวลาเฉลี่ยจริง (วินาที)" ของแถวนั้นๆ
+    // บันทึกลงในช่อง "เวลาเฉลี่ยจริง (วินาที)"
     const targetInput = document.getElementById(`resAvgSec_${day}`);
     if (targetInput) {
         targetInput.value = avgSec.toFixed(2);
