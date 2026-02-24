@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSA Operation Sign-Off Report (v1.0.10)</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
     <style>
         * { 
           box-sizing: border-box; 
@@ -232,22 +233,55 @@
 
 <div class="report-container">
     <h1 class="report-title">CSA OPERATION SIGN-OFF REPORT</h1>
+      <div style="display: flex; 
+                  gap: 10px; 
+                  justify-content: flex-end; 
+                  margin: 20px 0;">
+        
+  <button class="btn" 
+          onclick="exportToExcel()" 
+          style="background: #28a745; 
+                 color: white;
+                 border: none;
+                 padding: 10px 20px;
+                 border-radius: 5px;
+                 cursor: pointer;
+                 font-size: 14px;
+                 display: flex;
+                 align-items: center;
+                 gap: 5px;
+                 transition: background 0.3s;">
+    📊 Export to Excel
+  </button>
   
   <button class="btn btn-reset" 
           onclick="clearAllData()" 
           style="background: #dc3545;
-                 margin-left: auto;">🗑️ Clear All
+                 color: white;
+                 border: none;
+                 padding: 10px 20px;
+                 border-radius: 5px;
+                 cursor: pointer;
+                 font-size: 14px;
+                 display: flex;
+                 align-items: center;
+                 gap: 5px;
+                 transition: background 0.3s;">
+    🗑️ Clear All
   </button>
-
+</div>
     <div class="form-header">
         <div class="field"><label>ขั้นตอนหลัก</label>
-          <input type="text"></div>
+          <input type="text"
+                 id="header_process"></div>
       
         <div class="field"><label>พนักงาน</label>
-          <input type="text"></div>
+          <input type="text"
+                 id="header_employee"></div>
       
         <div class="field"><label>ครูฝึก</label>
-          <input type="text"></div>
+          <input type="text"
+                 id="header_trainer"></div>
       
         <div class="field"><label>SAM (นาที)</label>
           <input type="number" 
@@ -300,11 +334,13 @@
         </div>
       
         <div class="field"><label>วันที่เริ่มฝึก</label>
-          <input type="date"></div>
+          <input type="date"
+                 id="header_startDate"></div>
       
         <div class="field">
           <label>วันที่โอนย้าย</label>
-          <input type="date">
+          <input type="date"
+                 id="header_transferDate">
           </div>
     </div>
   
@@ -416,6 +452,92 @@
 </div>
 
 <script>
+
+function exportToExcel() {
+    const wb = XLSX.utils.book_new();
+    
+    // 1. เตรียม Header ส่วนพนักงาน (ขยับข้อมูลไปคอลัมน์ C)
+    const headerData = [
+        ["CSA OPERATION SIGN-OFF REPORT"],
+        [""],
+        [`ขั้นตอนหลัก: ${document.getElementById('header_process')?.value || "-"}`],
+        [`พนักงาน: ${document.getElementById('header_employee')?.value || "-"}`],
+        [`ครูฝึก: ${document.getElementById('header_trainer')?.value || "-"}`], 
+        [`ระดับงาน: ${document.getElementById('workLevel')?.value || "-"}`],
+        [`SAM (นาที): ${document.getElementById('globalSam')?.value || "0"}`], 
+        [`เป้าหมาย Eff (%): ${document.getElementById('globalEffTarget')?.value || "0"}`], 
+        [`จำนวนวันฝึก: ${document.getElementById('trainingDays')?.value || "0"}`],
+        [`ชนิดผ้า: ${document.getElementById('fabricType')?.value || "-"}`], 
+        [`วันที่เริ่มฝึก: ${document.getElementById('header_startDate')?.value || "-"}`], 
+        [`วันที่โอนย้าย: ${document.getElementById('header_transferDate')?.value || "-"}`],
+        [""] 
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(headerData);
+
+    // 2. ข้อมูลหัวตาราง
+    const tableHeader1 = ["วัน", "ประสิทธิภาพ", "", "", "", "", "", "คุณภาพ", "", "", "สาเหตุหลัก", "", "", "", "แผนการแก้ไข", "สถานะลายเซ็น"];
+    const tableHeader2 = ["", "เป้าหมายประสิทธิภาพ (%)", "เป้าหมายประสิทธิภาพ (ชิ้น)", "เวลาเฉลี่ยจริง (วินาที)", "เวลาต่อรอบจริง (นาที)", "ประสิทธิภาพจริง (%)", "ประสิทธิภาพจริง (ชิ้น)", "ผ่าน", "ไม่ผ่าน", "อัตราผ่าน %", "คน", "เครื่อง", "วิธีการ", "วัสดุ", "", ""];
+
+    XLSX.utils.sheet_add_aoa(ws, [tableHeader1], { origin: "A13" });
+    XLSX.utils.sheet_add_aoa(ws, [tableHeader2], { origin: "A14" });
+
+    // 3. ดึงข้อมูล Tbody 30 แถว
+    const rows = [];
+    for (let d = 1; d <= 30; d++) {
+        const rowData = [];
+        rowData.push(d); 
+        const inputs = [`targetEff_${d}`, `targetQty_${d}`, `resAvgSec_${d}`, `resAvgMin_${d}`, `resEffPerc_${d}`, `resEffPcs_${d}`, `qPass_${d}`, `qFail_${d}`, `resQRates_${d}`];
+        inputs.forEach(id => rowData.push(document.getElementById(id)?.value || ""));
+        const rowElem = document.querySelector(`#tableBody tr:nth-child(${d})`);
+        rowElem.querySelectorAll('input[type="checkbox"]').forEach(cb => rowData.push(cb.checked ? "/" : ""));
+        rowData.push(rowElem.querySelector('input[style*="text-align:left"]')?.value || "");
+        
+        // ตรวจสอบลายเซ็นด้วย logic ใหม่ที่แม่นยำ
+        const signImg = document.getElementById(`signImg_${d}`);
+        const isSigned = signImg && window.getComputedStyle(signImg).display !== 'none' && signImg.src.startsWith('data:image');
+        rowData.push(isSigned ? "SIGNED" : "-");
+
+        rows.push(rowData);
+    }
+    XLSX.utils.sheet_add_aoa(ws, rows, { origin: "A15" });
+
+    // 4. ใส่เส้นตาราง (Borders) และจัดกึ่งกลาง
+    const range = XLSX.utils.decode_range("A13:P44"); // ครอบคลุมหัวตารางถึงแถวที่ 30
+    const borderStyle = {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+        left: { style: "thin" },
+        right: { style: "thin" }
+    };
+
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
+            if (!ws[cell_address]) ws[cell_address] = { v: "" };
+            ws[cell_address].s = { 
+                border: borderStyle,
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+        }
+    }
+
+    // 5. ตั้งค่า Merges และ Columns (เหมือนเดิม)
+    ws['!merges'] = [
+        { s: { r: 12, c: 0 }, e: { r: 13, c: 0 } },
+        { s: { r: 12, c: 1 }, e: { r: 12, c: 6 } },
+        { s: { r: 12, c: 7 }, e: { r: 12, c: 9 } },
+        { s: { r: 12, c: 10 }, e: { r: 12, c: 13 } },
+        { s: { r: 12, c: 14 }, e: { r: 13, c: 14 } },
+        { s: { r: 12, c: 15 }, e: { r: 13, c: 15 } }
+    ];
+    ws['!cols'] = [{ wch: 8 }, { wch: 22 }, { wch: 22 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 6 }, { wch: 6 }, { wch: 6 }, { wch: 6 }, { wch: 35 }, { wch: 15 }];
+
+    XLSX.utils.book_append_sheet(wb, ws, "Operation Report");
+    const empName = document.getElementById('header_employee')?.value || "Employee";
+    XLSX.writeFile(wb, `CSA_Report_${empName}_${new Date().toLocaleDateString()}.xlsx`);
+}
+
 function clearAllData() {
     if (confirm("คุณต้องการลบข้อมูลทั้งหมดในฟอร์มนี้ใช่หรือไม่? ข้อมูลที่ลบแล้วไม่สามารถเรียกคืนได้")) {
         // 1. เคลียร์ข้อมูลใน Form Header
