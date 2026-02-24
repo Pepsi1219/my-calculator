@@ -690,7 +690,7 @@ function saveManualSeconds() {
 // --- Adaptive Logic (v1.9.0: จำกัดการแสดงผลตาม "จำนวนวันที่จะต้องฝึก") ---
 function calculateAdaptiveGoals() {
     const globalEff = parseFloat(document.getElementById('globalEffTarget').value) || 0;
-    const trainDays = parseInt(document.getElementById('trainingDays').value) || 0; // รับค่าจากช่องจำนวนวัน
+    const trainDays = parseInt(document.getElementById('trainingDays').value) || 0;
     const sam = parseFloat(document.getElementById('globalSam').value) || 0;
 
     const qtyT = (sam > 0) ? Math.ceil((60 / sam) * (globalEff / 100)) : 0;
@@ -707,7 +707,7 @@ function calculateAdaptiveGoals() {
     let lastActualEff = 0, lastActualDay = 0;
     for (let d = 1; d <= 30; d++) {
         let effStr = document.getElementById(`resEffPerc_${d}`).value;
-        if (effStr) { 
+        if (effStr && effStr !== "") { 
             lastActualEff = parseFloat(effStr); 
             lastActualDay = d; 
         }
@@ -718,31 +718,42 @@ function calculateAdaptiveGoals() {
         const targetQtyInput = document.getElementById(`targetQty_${d}`);
         const effInput = document.getElementById(`resEffPerc_${d}`);
         
-        let targetValue = 0;
-        let showTarget = false;
+        // --- ส่วนที่แก้ไขใหม่ ---
+        // 1. ถ้าวันนั้น "มีผลงานจริงบันทึกอยู่แล้ว" (d <= lastActualDay) 
+        //    และ "มีค่าเป้าหมายเดิมอยู่แล้ว" ให้ข้ามการคำนวณเพื่อล็อกค่าเดิมไว้
+        if (d <= lastActualDay && targetInput.value !== "") {
+            // ไม่ทำอะไร เพื่อรักษาค่าเป้าหมายเดิมในวันที่บันทึกไปแล้ว
+        } 
+        else {
+            let targetValue = 0;
+            let showTarget = false;
 
-        // เงื่อนไข v1.9.0: แสดงผลเมื่อ (เข้าเงื่อนไข Quality = 100%) AND (ไม่เกินจำนวนวันฝึกที่กำหนด)
-        if (firstDayQ100 > 0 && d > firstDayQ100 && d <= trainDays) {
-            showTarget = true;
-            if (d <= lastActualDay) {
-                targetValue = (globalEff / trainDays) * d; 
-            } else {
+            if (firstDayQ100 > 0 && d > firstDayQ100 && d <= trainDays) {
+                showTarget = true;
+                
+                // คำนวณเฉพาะวันที่ยังไม่มีผลงานจริง (Future Days)
                 const remainingDays = trainDays - lastActualDay;
                 if (remainingDays > 0) {
                     const increment = (globalEff - lastActualEff) / remainingDays;
                     targetValue = lastActualEff + (increment * (d - lastActualDay));
-                } else { targetValue = globalEff; }
+                } else { 
+                    targetValue = globalEff; 
+                }
+            }
+
+            if (showTarget) {
+                const finalT = Math.ceil(Math.min(targetValue, globalEff));
+                targetInput.value = finalT + "%";
+                if (sam > 0) targetQtyInput.value = Math.ceil((60 / sam) * (finalT / 100));
+            } else {
+                // เคลียร์ค่าเฉพาะวันที่ยังไม่ถึงเงื่อนไข หรือเกินจำนวนวันฝึก
+                targetInput.value = ""; 
+                targetQtyInput.value = "";
             }
         }
+        // --- จบส่วนแก้ไข ---
 
-        if (showTarget) {
-            const finalT = Math.ceil(Math.min(targetValue, globalEff));
-            targetInput.value = finalT + "%";
-            if (sam > 0) targetQtyInput.value = Math.ceil((60 / sam) * (finalT / 100));
-        } else {
-            targetInput.value = ""; targetQtyInput.value = "";
-        }
-
+        // ส่วนเปรียบเทียบสี (คงเดิม)
         const currentEff = parseFloat(effInput.value) || 0;
         const currentTarget = parseFloat(targetInput.value) || 0;
         
