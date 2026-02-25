@@ -33,7 +33,7 @@
           margin-bottom: 20px; 
           color: #1a3c6d; 
           border-bottom: 2px solid #1a3c6d; 
-          padding-bottom: 10px; 
+          padding-bottom: 10px;
       }
         .form-header { 
           display: grid; 
@@ -71,11 +71,21 @@
       
         .report-table {
           width: 100%;
+          background-color: #FFFFFF;
           border-collapse: collapse;
           min-width: 1400px;
           font-size: .75rem;
           table-layout: fixed;
       }
+         .report-table input { 
+          width: 100%;
+          background-color: #FFFFFF;
+          border: 0px; 
+          padding: 4px; 
+          text-align: center; 
+          background: transparent; 
+      }
+      
         .cause-col {
           width: 40px;
       }
@@ -94,22 +104,12 @@
           background: #f0f4ff; 
           font-weight: bold;
       }
-      
+        
         .clickable-input { 
           cursor: pointer; 
           background: #fffde7 !important; 
           font-weight: bold; 
-          color: #1a3c6d; 
-          border: 1px solid #ffe082 !important; 
           border-radius: 4px;
-      }
-      
-        .report-table input { 
-          width: 100%; 
-          border: 0px; 
-          padding: 4px; 
-          text-align: center; 
-          background: transparent; 
       }
         
         .text-success { 
@@ -214,7 +214,7 @@
         .sign-cell { 
           cursor: pointer; 
           min-width: 20px; 
-          height: 38px; 
+          height: 45px; 
           background: #fff; 
           display: flex; 
           align-items: center; 
@@ -463,54 +463,22 @@
 </div>
     </div> 
       </div> 
-        <div class="evaluation-section" 
-             style="margin-top: 30px; font-family: sans-serif;">
-          
-    <h3 style="border-bottom: 2px solid #333; padding-bottom: 5px;">สรุปการประเมิน</h3>
-          
-    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; border: 1px solid #ccc;">
-        <thead>
-            <tr style="background-color: #f8f9fa;">
-                <th style="border: 1px solid #ccc; padding: 12px; text-align: left;">รายละเอียดคำแนะนำ</th>
-                <th style="border: 1px solid #ccc; padding: 12px; text-align: center; width: 150px;">การตัดสินใจ</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="border: 1px solid #ccc; padding: 10px;">ผ่านแบบมีเงื่อนไข หากผ่านการทดสอบอย่างน้อยหนึ่งในสองข้อ</td>
-                <td style="border: 1px solid #ccc; text-align: center;">
-                  <input type="checkbox" id="eval_cond" style="transform: scale(1.5);"></td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ccc; padding: 10px;">ผ่านการทดสอบทั้งด้านประสิทธิภาพ (EFF) และคุณภาพ (RFT)</td>
-                <td style="border: 1px solid #ccc; text-align: center;">
-                  <input type="checkbox" 
-                         id="eval_both" 
-                         style="transform: scale(1.5);"></td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ccc; padding: 10px;">ได้คะแนนอย่างน้อย 60% ในการฝึกการปฏิบัติงาน</td>
-                <td style="border: 1px solid #ccc; text-align: center;">
-                  <input type="checkbox" 
-                         id="eval_60" 
-                         style="transform: scale(1.5);"></td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ccc; padding: 10px;">ได้คะแนนอย่างน้อย 90% ในการฝึกการปฏิบัติงาน</td>
-                <td style="border: 1px solid #ccc; text-align: center;">
-                  <input type="checkbox" 
-                         id="eval_90" 
-                         style="transform: scale(1.5);"></td>
-            </tr>
-        </tbody>
-    </table>
 </div>
   
-<div id="chartModal" style="display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.8);">
-    <div style="background:white; margin:5% auto; padding:20px; width:80%; border-radius:10px;">
-        <span onclick="document.getElementById('chartModal').style.display='none'" style="float:right; cursor:pointer; font-size:24px;">&times;</span>
+          <div id="chartModal" 
+               style="display:none; 
+                      position:fixed; z-index:999; 
+                      left:0; top:0; width:100%; 
+                      height:100%; background:rgba(0,0,0,0.8);">
+    <div style="background:white; 
+                margin:5% auto; padding:20px; width:80%; border-radius:10px;">
+        <span onclick="document.getElementById('chartModal').style.display='none'" 
+              style="float:right; cursor:pointer; font-size:24px;">&times;</span>
+      
         <h2 style="text-align:center;">กราฟเปรียบเทียบเป้าหมาย vs ประสิทธิภาพจริง</h2>
-        <canvas id="performanceChart" width="400" height="200"></canvas>
+        <canvas id="performanceChart" 
+                width="400" 
+                height="200"></canvas>
     </div>
 </div>
 
@@ -520,12 +488,16 @@
     <div class="modal-content">
         <h3>ระบุเวลาเฉลี่ย (วินาที)</h3>
         <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">วันที่ <span id="modalDayLabel"></span></p>
-        <input type="number" id="manualSecondsInput" step="0.01" inputmode="decimal" placeholder="00">
+        <input type="number" 
+               id="manualSecondsInput" 
+               step="0.01" 
+               inputmode="decimal" 
+               placeholder="00">
         <div class="sign-btn-group">
             <button class="btn btn-save" 
-             onclick="saveManualSeconds()">บันทึก</button>
+                    onclick="saveManualSeconds()">บันทึก</button>
             <button class="btn btn-stop" 
-             onclick="closeManualModal()">ยกเลิก</button>
+                    onclick="closeManualModal()">ยกเลิก</button>
         </div>
     </div>
 </div>
@@ -968,6 +940,23 @@ function saveManualSeconds() {
     }
 }
 
+function handleAvgSecChange(d) {
+    const avgSecInput = document.getElementById(`resAvgSec_${d}`);
+    const qFailInput = document.getElementById(`qFail_${d}`);
+
+    // ถ้ามีการป้อนข้อมูลในช่องเวลาเฉลี่ย และช่อง "ไม่ผ่าน" ยังว่างอยู่
+    if (avgSecInput.value !== "" && qFailInput.value === "") {
+        qFailInput.value = 0;
+        
+        // อย่าลืมสั่งรันฟังก์ชันคำนวณคุณภาพใหม่ด้วย (ถ้าคุณมี)
+        // เพื่อให้ช่อง "ผ่าน" หรือ "อัตราผ่าน %" อัปเดตตาม
+        if (typeof calculateQuality === "function") {
+            calculateQuality(d);
+        }
+    }
+}
+  
+  
 // --- Adaptive Logic (v1.9.0: จำกัดการแสดงผลตาม "จำนวนวันที่จะต้องฝึก") ---
 function calculateAdaptiveGoals() {
     const globalEff = parseFloat(document.getElementById('globalEffTarget').value) || 0;
